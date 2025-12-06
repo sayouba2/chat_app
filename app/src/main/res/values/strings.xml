@@ -7,4 +7,8 @@
 
     <string name="button_login">Se Connecter</string>
     <string name="link_register">Pas encore de compte ? S\'inscrire</string>
+
+    <string name="button_create_account">Creer mon compte</string>
+    <string name="hint_nometprenom">Nom et Prenom</string>
+    <string name="hint_pseudo">Pseudo</string>
 </resources>
