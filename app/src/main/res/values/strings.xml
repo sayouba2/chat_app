@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">chat_app</string>
+    <string name="button_create_account">Creer mon compte</string>
+    <string name="hint_password">Mot de Passe</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_nometprenom">Nom et Prenom</string>
+    <string name="hint_pseudo">Pseudo</string>
 </resources>
