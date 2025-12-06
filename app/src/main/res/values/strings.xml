@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">chat_app</string>
+    <string name="login_title">Bienvenue !</string>
+
+    <string name="hint_email">Adresse E-mail</string>
+    <string name="hint_password">Mot de passe</string>
+
+    <string name="button_login">Se Connecter</string>
+    <string name="link_register">Pas encore de compte ? S\'inscrire</string>
 </resources>
