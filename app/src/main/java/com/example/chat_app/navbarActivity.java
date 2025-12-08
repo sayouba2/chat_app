@@ -1,0 +1,125 @@
+package com.example.chat_app;
+
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+
+public class navbarActivity extends AppCompatActivity {
+
+    protected DrawerLayout drawerLayout;
+    protected NavigationView navigationView;
+    // Variables pour le Header (pour pouvoir les modifier plus tard)
+    protected CircleImageView headerImage;
+    protected TextView headerPseudo;
+    protected TextView headerNbrAmis;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Rien de spécial ici car tout se passe dans setContentView
+    }
+
+    @Override
+    public void setContentView(int layoutResID) {
+        // 1. On charge le layout principal (celui qui contient le menu)
+        // Note: Assure-toi que ton fichier XML s'appelle bien activity_main
+        DrawerLayout fullView = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_navbar, null);
+
+        // 2. On trouve le conteneur vide où le contenu des pages ira
+        // Note: Assure-toi d'avoir un FrameLayout avec l'ID base_content dans activity_main.xml
+        FrameLayout activityContainer = fullView.findViewById(R.id.base_content);
+
+        // 3. On injecte le layout de l'enfant (layoutResID) dans ce conteneur
+        getLayoutInflater().inflate(layoutResID, activityContainer, true);
+
+        // 4. On définit le tout comme la vue de l'activité
+        super.setContentView(fullView);
+
+        // 5. Initialisation des vues
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+
+        // 6. Gestion des clics du menu
+        setupNavigationDrawer();
+        // 7. Modification des element Entete
+        setupNavigationHeader();
+    }
+
+    private void setupNavigationDrawer() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+
+                // En Java moderne sur Android, on utilise if/else pour les IDs
+                // car "switch" pose parfois problème avec les dernières versions de Gradle
+                if (id == R.id.home_view) {
+                    Toast.makeText(navbarActivity.this, "Home", Toast.LENGTH_SHORT).show();
+                } else if (id == R.id.profil_view) {
+                    Toast.makeText(navbarActivity.this, "Mes Infos", Toast.LENGTH_SHORT).show();
+                } else if (id == R.id.logout) {
+                    Toast.makeText(navbarActivity.this, "Déconnecter", Toast.LENGTH_SHORT).show();
+                } else if (id == R.id.share) {
+                    Toast.makeText(navbarActivity.this, "Partager", Toast.LENGTH_SHORT).show();
+                } else if (id == R.id.evaluation) {
+                    Toast.makeText(navbarActivity.this, "Évaluation", Toast.LENGTH_SHORT).show();
+                }
+
+                // Fermer le menu après le clic
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
+    }
+
+    private void setupNavigationHeader() {
+        // On vérifie qu'il y a bien un header pour éviter un crash
+        if (navigationView.getHeaderCount() > 0) {
+            View header = navigationView.getHeaderView(0);
+
+            // Image
+            de.hdodenhof.circleimageview.CircleImageView image = header.findViewById(R.id.imageHeader);
+            image.setImageResource(R.drawable.img);
+
+            // Pseudo
+            TextView pseudo = header.findViewById(R.id.pseudo);
+            pseudo.setText("Pseudo_m_09");
+
+            // Amis
+            TextView nbrAmis = header.findViewById(R.id.nbrAmis);
+            nbrAmis.setText("230");
+        }
+    }
+
+    // --- FONCTION 2 : MISE A JOUR (UPDATE) Les infos du hrader de la navbar---
+    // Cette fonction est publique pour être appelée depuis d'autres endroits si besoin
+    public void updateHeaderInfo(String pseudo, String nbAmis, int imageResId) {
+        // On vérifie que les vues ont bien été initialisées pour éviter les crashs (NullPointerException)
+        if (headerPseudo != null) {
+            headerPseudo.setText(pseudo);
+        }
+        if (headerNbrAmis != null) {
+            headerNbrAmis.setText(nbAmis);
+        }
+        if (headerImage != null && imageResId != 0) {
+            headerImage.setImageResource(imageResId);
+        }
+    }
+}

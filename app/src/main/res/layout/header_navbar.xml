@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"
+    android:background="@color/colorSecondary"
+    android:orientation="horizontal"
+    android:paddingStart="10dp"
+    tools:ignore="RtlSymmetry">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imageHeader"
+        android:layout_width="205dp"
+        android:layout_height="178dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="35dp"
+        tools:src="@tools:sample/avatars" />
+
+    <ImageView
+        android:id="@+id/btnPlus"
+        android:layout_width="35dp"
+        android:layout_height="40dp"
+        android:contentDescription="@string/modifier_l_image"
+        android:src="@drawable/ic_plus_24"
+        app:layout_constraintEnd_toEndOf="@id/imageHeader"
+        app:layout_constraintBottom_toBottomOf="@id/imageHeader" />
+
+    <TextView
+        android:id="@+id/pseudo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/braah_one"
+        android:textColor="#EEEEEE"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/imageHeader"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Votre Pseudo" />
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/email"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:text="example@gmail.comdffsfdfsfdsf"-->
+    <!--        android:textColor="@color/white"-->
+    <!--        app:layout_constraintTop_toTopOf="@id/pseudo"-->
+    <!--        android:layout_marginTop="40dp"-->
+    <!--        app:layout_constraintStart_toEndOf="@id/imageHeader"/>-->
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintStart_toEndOf="@id/imageHeader"
+        app:layout_constraintTop_toBottomOf="@id/pseudo">
+
+        <TextView
+            android:id="@+id/nbrAmis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:fontFamily="cursive"
+            android:textColor="@color/colorBackground"
+            android:textStyle="bold"
+            android:layout_gravity="top"
+            tools:text="1234" />
+
+        <TextView
+            android:id="@+id/followers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amis"
+            android:textColor="@color/colorBackground"
+            android:textStyle="bold"
+            tools:layout_editor_absoluteX="28dp"
+            tools:layout_editor_absoluteY="252dp" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
