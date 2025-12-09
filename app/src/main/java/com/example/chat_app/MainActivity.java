@@ -26,6 +26,7 @@ public class MainActivity extends navbarActivity {
         Button btnTest=findViewById(R.id.btnTest);
         Button btnLoginTest=findViewById(R.id.btnTestLogin);
         Button btnRegisterTest=findViewById(R.id.btnTestRegister);
+        Button btnDiscussionTest=findViewById(R.id.btnTestDiscussion);
 
 
         btnTest.setOnClickListener(new View.OnClickListener() {
@@ -49,6 +50,14 @@ public class MainActivity extends navbarActivity {
             public void onClick(View v) {
                 // Créer un Intent pour ouvrir la nouvelle activité
                 Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+                startActivity(intent);
+            }
+        });
+        btnDiscussionTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Créer un Intent pour ouvrir la nouvelle activité
+                Intent intent = new Intent(MainActivity.this, DiscussionActivity.class);
                 startActivity(intent);
             }
         });

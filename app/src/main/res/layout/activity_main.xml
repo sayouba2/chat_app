@@ -38,5 +38,13 @@
         android:text="Boutton de Test Vers RegisterActivity"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/colorPrimary"/>
+    <Button
+        android:id="@+id/btnTestDiscussion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Boutton de Test Vers DiscutionActivity"
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="@color/colorSecondary"/>
 
 </LinearLayout>

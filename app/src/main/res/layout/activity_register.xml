@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/register_page"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
     tools:context=".RegisterActivity">
@@ -19,7 +19,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <View
         android:layout_width="150dp"
         android:layout_height="150dp"
@@ -31,140 +30,158 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        app:cardBackgroundColor="@color/colorBackground"
-        app:cardCornerRadius="30dp"
-        app:cardElevation="12dp"
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@color/colorPrimaryDark"/>
-
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="30dp">
+            android:paddingBottom="20dp"
+            android:paddingTop="20dp">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="38dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/profile"
-                app:civ_border_color="@color/colorTextOnPrimary"
-                app:civ_border_width="6dp"
-                app:civ_circle_background_color="@color/colorPrimaryDark" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/nom_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
+            <androidx.cardview.widget.CardView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxCornerRadiusBottomEnd="30dp"
-                app:boxCornerRadiusBottomStart="30dp"
-                app:boxCornerRadiusTopEnd="30dp"
-                app:boxCornerRadiusTopStart="30dp"
-                app:boxStrokeColor="@color/colorPrimary"
-                app:startIconTint="@color/colorPrimary">
+                android:layout_marginHorizontal="24dp"
+                app:cardBackgroundColor="@color/colorBackground"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="12dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/nometprenom_edit_text"
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@color/colorPrimaryDark" />
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/hint_nometprenom"
-                    android:inputType="textEmailAddress" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:orientation="vertical"
+                    android:padding="30dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/pseudo_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxCornerRadiusBottomEnd="30dp"
-                app:boxCornerRadiusBottomStart="30dp"
-                app:boxCornerRadiusTopEnd="30dp"
-                app:boxCornerRadiusTopStart="30dp"
-                app:boxStrokeColor="@color/colorPrimary"
-                app:startIconTint="@color/colorPrimary">
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/image_register"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="38dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/profile"
+                        app:civ_border_color="@color/colorTextOnPrimary"
+                        app:civ_border_width="6dp"
+                        app:civ_circle_background_color="@color/colorPrimaryDark" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/pseudo_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_pseudo"
-                    android:inputType="textEmailAddress" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/nom_layout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:boxCornerRadiusBottomEnd="30dp"
+                        app:boxCornerRadiusBottomStart="30dp"
+                        app:boxCornerRadiusTopEnd="30dp"
+                        app:boxCornerRadiusTopStart="30dp"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:startIconTint="@color/colorPrimary">
 
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/nometprenom_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint_nometprenom"
+                            android:inputType="textPersonName" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/email_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxCornerRadiusBottomEnd="30dp"
-                app:boxCornerRadiusBottomStart="30dp"
-                app:boxCornerRadiusTopEnd="30dp"
-                app:boxCornerRadiusTopStart="30dp"
-                app:boxStrokeColor="@color/colorPrimary"
-                app:startIconTint="@color/colorPrimary">
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/pseudo_layout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:boxCornerRadiusBottomEnd="30dp"
+                        app:boxCornerRadiusBottomStart="30dp"
+                        app:boxCornerRadiusTopEnd="30dp"
+                        app:boxCornerRadiusTopStart="30dp"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:startIconTint="@color/colorPrimary">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/email_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_email"
-                    android:inputType="textEmailAddress" />
-            </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/pseudo_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint_pseudo"
+                            android:inputType="textVisiblePassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/password_layout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:boxCornerRadiusBottomEnd="30dp"
-                app:boxCornerRadiusBottomStart="30dp"
-                app:boxCornerRadiusTopEnd="30dp"
-                app:boxCornerRadiusTopStart="30dp"
-                app:boxStrokeColor="@color/colorPrimary"
-                app:passwordToggleEnabled="true"
-                app:startIconTint="@color/colorPrimary">
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/email_layout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:boxCornerRadiusBottomEnd="30dp"
+                        app:boxCornerRadiusBottomStart="30dp"
+                        app:boxCornerRadiusTopEnd="30dp"
+                        app:boxCornerRadiusTopStart="30dp"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:startIconTint="@color/colorPrimary">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/password_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_password"
-                    android:inputType="textPassword" />
-            </com.google.android.material.textfield.TextInputLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/email_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint_email"
+                            android:inputType="textEmailAddress" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
-                android:id="@+id/login_button"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:backgroundTint="@color/colorPrimaryDark"
-                android:elevation="4dp"
-                android:text="@string/button_create_account"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="30dp" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/password_layout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="24dp"
+                        app:boxCornerRadiusBottomEnd="30dp"
+                        app:boxCornerRadiusBottomStart="30dp"
+                        app:boxCornerRadiusTopEnd="30dp"
+                        app:boxCornerRadiusTopStart="30dp"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:passwordToggleEnabled="true"
+                        app:startIconTint="@color/colorPrimary">
 
-        </LinearLayout>
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/password_edit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/hint_password"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-    </androidx.cardview.widget.CardView>
+                    <Button
+                        android:id="@+id/login_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:backgroundTint="@color/colorPrimaryDark"
+                        android:elevation="4dp"
+                        android:text="@string/button_create_account"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="30dp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

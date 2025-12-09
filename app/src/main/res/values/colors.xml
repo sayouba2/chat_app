@@ -5,4 +5,5 @@
     <color name="colorPrimary">#134B70</color>
     <color name="colorPrimaryDark">#201E43</color>
     <color name="colorTextOnPrimary">#FFFFFF</color>
+    <color name="text_hint">#7D8FB3</color>
 </resources>

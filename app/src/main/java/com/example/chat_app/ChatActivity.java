@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,8 +19,18 @@ public class ChatActivity extends navbarActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.chat_main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
-
+        TextView userName = findViewById(R.id.pseudo);
+        ImageView userProfile = findViewById(R.id.image_profile);
+        String name = getIntent().getStringExtra("NOM_USER");
+        int resImg = getIntent().getIntExtra("IMG_USER", R.drawable.img);
+        userName.setText(name);
+        userProfile.setImageResource(resImg);
         // 1. On récupère le bouton (les 3 points) via son ID défini dans le XML layout
         ImageView btnMenu = findViewById(R.id.chat_menu);
 
@@ -56,12 +67,5 @@ public class ChatActivity extends navbarActivity {
             }
         });
 
-
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.chat_main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
     }
 }
