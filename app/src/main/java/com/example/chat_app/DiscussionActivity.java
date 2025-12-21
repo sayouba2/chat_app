@@ -9,7 +9,10 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
-
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import com.google.firebase.Timestamp;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -84,40 +87,45 @@ public class DiscussionActivity extends navbarActivity {
         db.collection("Conversations")
                 .document(myUid)
                 .collection("chats")
-                .orderBy("timestamp", Query.Direction.DESCENDING) // Triez par le plus récent
+                .orderBy("timestamp", Query.Direction.DESCENDING) // Trie par le plus récent
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
-                        Toast.makeText(DiscussionActivity.this, "Erreur de chargement: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                        return;
+                        return; // Gérer l'erreur silencieusement ou avec un Log
                     }
 
-                    if (value != null && !value.isEmpty()) {
+                    if (value != null) {
                         maListeDeDiscussions.clear();
 
                         for (DocumentSnapshot doc : value.getDocuments()) {
-                            // Supposons que votre document Conversation contient ces champs:
                             String uidDestinataire = doc.getString("uid");
                             String nom = doc.getString("name");
                             String dernierMessage = doc.getString("lastMessage");
                             String imageUrl = doc.getString("imageUrl");
-                            // Pour l'heure et isNonLu, vous devrez implémenter la logique
 
-                            // Création de l'objet Discussion
+                            // --- MODIFICATION ICI : GESTION DE L'HEURE ---
+                            String heureFormattee = "";
+                            Timestamp timestampObj = doc.getTimestamp("timestamp");
+
+                            if (timestampObj != null) {
+                                Date date = timestampObj.toDate();
+                                // Format simple : "14:30"
+                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                                heureFormattee = sdf.format(date);
+                            }
+                            // ---------------------------------------------
+
+                            // Création de l'objet Discussion avec la vraie heure
                             Discussion discussion = new Discussion(
                                     nom,
-                                    dernierMessage != null ? dernierMessage : "Commencer la conversation",
-                                    "Heure", // Logique d'heure à implémenter
+                                    dernierMessage != null ? dernierMessage : "",
+                                    heureFormattee, // On passe la variable ici au lieu de "Heure"
                                     imageUrl,
-                                    false, // Logique "non lu" à implémenter
+                                    false, // Logique "non lu" à venir
                                     uidDestinataire
                             );
 
                             maListeDeDiscussions.add(discussion);
                         }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        // La liste est vide, on laisse l'écran vide (ce qui est correct)
-                        maListeDeDiscussions.clear();
                         adapter.notifyDataSetChanged();
                     }
                 });

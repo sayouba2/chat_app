@@ -14,7 +14,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import java.util.HashMap;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -137,4 +140,29 @@ public class navbarActivity extends AppCompatActivity {
             headerImage.setImageResource(imageResId);
         }
     }
+    private void updateUserStatus(String status) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("UsersStatus").child(currentUser.getUid());
+
+            HashMap<String, Object> onlineState = new HashMap<>();
+            onlineState.put("status", status);
+            onlineState.put("lastSeen", System.currentTimeMillis()); // Optionnel : pour afficher "Vu à..."
+
+            userRef.updateChildren(onlineState);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUserStatus("online");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        updateUserStatus("offline");
+    }
+
 }

@@ -2,6 +2,10 @@ package com.example.chat_app;
 // Vérifie que c'est le bon nom de ton package
 
 public class Discussion {
+    private String status; // "online" ou "offline"
+    // Ajoutez le getter et le setter
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     private String nom;
     private String dernierMessage;
     private String heure;

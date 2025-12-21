@@ -11,19 +11,20 @@
     <FrameLayout
         android:id="@+id/base_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
 
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:itemTextColor="@color/colorPrimary"
-        app:itemIconTint="@color/colorSecondary"
-        android:background="@color/colorBackground"
-        android:layout_gravity="start"
-        app:headerLayout="@layout/header_navbar"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/navbar_menu"/>
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="@color/colorBackground"
+            android:fitsSystemWindows="true"
+            app:headerLayout="@layout/header_navbar"
+            app:itemIconTint="@color/colorSecondary"
+            app:itemTextColor="@color/colorPrimary"
+            app:menu="@menu/navbar_menu" />
+    </FrameLayout>
 
 
 </androidx.drawerlayout.widget.DrawerLayout>

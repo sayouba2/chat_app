@@ -76,7 +76,14 @@ public class ChatActivity extends AppCompatActivity {
         otherUid = getIntent().getStringExtra("uid_destinataire");
         receiverName = getIntent().getStringExtra("nom_destinataire"); // Attribution à la variable globale
         receiverImage = getIntent().getStringExtra("image_destinataire"); // Attribution à la variable globale
-
+        if (receiverImage != null && !receiverImage.equals("default")) {
+            if (receiverImage.startsWith("http")) {
+                Glide.with(this).load(receiverImage).into(profileIv);
+            } else {
+                int resId = getResources().getIdentifier(receiverImage, "drawable", getPackageName());
+                if(resId != 0) profileIv.setImageResource(resId);
+            }
+        }
         // Générer ID conversation unique (A_B ou B_A)
         if (myUid.compareTo(otherUid) < 0) chatRoomId = myUid + "_" + otherUid;
         else chatRoomId = otherUid + "_" + myUid;
