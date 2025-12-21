@@ -7,19 +7,19 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton; // Attention ImageButton maintenant dans le XML
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
+import com.bumptech.glide.Glide;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,23 +33,25 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class DiscussionActivity extends navbarActivity {
+import de.hdodenhof.circleimageview.CircleImageView;
 
-    // On sépare les vues
-    private RecyclerView recyclerPrivate, recyclerGroups;
-    private DiscussionAdapter adapterPrivate, adapterGroups;
+public class DiscussionActivity extends AppCompatActivity {
 
-    // On sépare les listes
-    private List<Discussion> privateList;
-    private List<Discussion> groupList;
+    private RecyclerView recyclerDiscussions;
+    private DiscussionAdapter discussionAdapter;
+    private List<Discussion> discussionList;
+    private List<Discussion> fullDiscussionList;
 
-    // Listes complètes pour la recherche (copie de sauvegarde)
-    private List<Discussion> fullPrivateList;
-    private List<Discussion> fullGroupList;
-
-    private ImageButton btnAddFriend;
-    private Button btnCompose;
+    // Nouveaux composants UI
+    private ImageButton btnMenu, btnAddFriend;
+    private FloatingActionButton btnCompose; // Changé en FAB
     private EditText etSearch;
+
+    // Composants de la barre du bas
+    private CircleImageView bottomProfileImage;
+    private TextView bottomPseudo;
+    private TextView bottomFriendsCount;
+
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private String myUid;
@@ -63,232 +65,243 @@ public class DiscussionActivity extends navbarActivity {
         mAuth = FirebaseAuth.getInstance();
 
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) return;
+        if (currentUser == null) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
         myUid = currentUser.getUid();
 
         initViews();
-        setupRecyclerViews();
-
-        // Actions Boutons
-        btnCompose.setOnClickListener(v -> showAllUsersDialog());
-
-        // NOUVEAU : Action Ajouter Ami
-        btnAddFriend.setOnClickListener(v -> {
-            Intent intent = new Intent(DiscussionActivity.this, FindFriendsActivity.class);
-            startActivity(intent);
-        });
-
-        // Recherche
-        setupSearch();
+        setupRecyclerView();
+        setupListeners();
 
         // Chargement des données
-        chargerLesDiscussionsExistantes();
+        chargerDiscussions();
+        loadUserProfileData(); // Charger le profil en bas
+        updateUserStatus("online");
     }
 
     private void initViews() {
-        recyclerPrivate = findViewById(R.id.recyclerPrivate);
-        recyclerGroups = findViewById(R.id.recyclerGroups);
+        recyclerDiscussions = findViewById(R.id.recyclerDiscussions);
         etSearch = findViewById(R.id.etSearch);
-        btnCompose = findViewById(R.id.btnCompose);     // Cast automatique en Button
+        btnCompose = findViewById(R.id.btnCompose);
         btnAddFriend = findViewById(R.id.btnAddFriend);
+        btnMenu = findViewById(R.id.btnMenu);
+
+        // Liaison de la barre du bas
+        bottomProfileImage = findViewById(R.id.bottomProfileImage);
+        bottomPseudo = findViewById(R.id.bottomPseudo);
+        bottomFriendsCount = findViewById(R.id.bottomFriendsCount);
     }
 
-    private void setupRecyclerViews() {
-        // Initialisation des listes
-        privateList = new ArrayList<>();
-        groupList = new ArrayList<>();
-        fullPrivateList = new ArrayList<>();
-        fullGroupList = new ArrayList<>();
+    // --- NOUVELLE FONCTION : Charger les infos du bas ---
+    private void loadUserProfileData() {
+        // 1. Récupérer Pseudo et Photo
+        db.collection("users").document(myUid).get().addOnSuccessListener(doc -> {
+            if (doc.exists()) {
+                String pseudo = doc.getString("pseudo");
+                String image = doc.getString("image");
 
-        // Config Recycler Privé
-        recyclerPrivate.setLayoutManager(new LinearLayoutManager(this));
-        adapterPrivate = new DiscussionAdapter(privateList, this, discussion -> openChat(discussion));
-        recyclerPrivate.setAdapter(adapterPrivate);
+                if (pseudo != null) bottomPseudo.setText("@" + pseudo);
+                else bottomPseudo.setText("Moi");
 
-        // Config Recycler Groupes
-        recyclerGroups.setLayoutManager(new LinearLayoutManager(this));
-        adapterGroups = new DiscussionAdapter(groupList, this, discussion -> openChat(discussion));
-        recyclerGroups.setAdapter(adapterGroups);
-    }
-
-    private void openChat(Discussion discussion) {
-        Intent intent = new Intent(DiscussionActivity.this, ChatActivity.class);
-        intent.putExtra("uid_destinataire", discussion.getUid()); // Pour un groupe, ce sera le GroupID
-        intent.putExtra("nom_destinataire", discussion.getNom());
-        intent.putExtra("image_destinataire", discussion.getPhotoUrl());
-
-        // Si c'est un groupe, on peut passer un extra pour l'indiquer (optionnel si ChatActivity gère déjà par ID)
-        if ("group".equals(discussion.getType())) {
-            intent.putExtra("groupId", discussion.getUid());
-        }
-
-        startActivity(intent);
-    }
-
-    private void setupSearch() {
-        etSearch.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                filter(s.toString());
+                // Gestion image (URL ou Drawable)
+                if (image != null && !image.isEmpty()) {
+                    if (image.startsWith("http")) {
+                        Glide.with(this).load(image).placeholder(R.drawable.img).into(bottomProfileImage);
+                    } else {
+                        int resId = getResources().getIdentifier(image, "drawable", getPackageName());
+                        bottomProfileImage.setImageResource(resId != 0 ? resId : R.drawable.img);
+                    }
+                }
             }
         });
-    }
 
-    private void filter(String text) {
-        // Filtre Liste Privée
-        List<Discussion> filteredPrivate = new ArrayList<>();
-        if (fullPrivateList != null) {
-            for (Discussion item : fullPrivateList) {
-                if (item.getNom().toLowerCase().contains(text.toLowerCase())) {
-                    filteredPrivate.add(item);
-                }
-            }
-            adapterPrivate.filterList(filteredPrivate);
-        }
-
-        // Filtre Liste Groupes
-        List<Discussion> filteredGroups = new ArrayList<>();
-        if (fullGroupList != null) {
-            for (Discussion item : fullGroupList) {
-                if (item.getNom().toLowerCase().contains(text.toLowerCase())) {
-                    filteredGroups.add(item);
-                }
-            }
-            adapterGroups.filterList(filteredGroups);
-        }
-    }
-
-    private void chargerLesDiscussionsExistantes() {
-        if (myUid == null) return;
-
-        db.collection("Conversations")
-                .document(myUid)
-                .collection("chats")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) return;
-
-                    if (value != null) {
-                        privateList.clear();
-                        groupList.clear();
-
-                        for (DocumentSnapshot doc : value.getDocuments()) {
-                            String uidDestinataire = doc.getString("uid");
-                            String nom = doc.getString("name");
-                            String dernierMessage = doc.getString("lastMessage");
-                            String imageUrl = doc.getString("imageUrl");
-                            String type = doc.getString("type"); // Récupère le type (chat ou group)
-
-                            // Gestion Heure
-                            String heureFormattee = "";
-                            Timestamp timestampObj = doc.getTimestamp("timestamp");
-                            if (timestampObj != null) {
-                                Date date = timestampObj.toDate();
-                                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                                heureFormattee = sdf.format(date);
-                            }
-
-                            Discussion discussion = new Discussion(
-                                    nom,
-                                    dernierMessage != null ? dernierMessage : "",
-                                    heureFormattee,
-                                    imageUrl,
-                                    false,
-                                    uidDestinataire,
-                                    type // On passe le type
-                            );
-
-                            // TRI : GROUPE ou PRIVÉ ?
-                            if ("group".equals(type)) {
-                                groupList.add(discussion);
-                            } else {
-                                privateList.add(discussion);
-                            }
-                        }
-
-                        // Mettre à jour les copies complètes pour la recherche
-                        fullPrivateList = new ArrayList<>(privateList);
-                        fullGroupList = new ArrayList<>(groupList);
-
-                        adapterPrivate.notifyDataSetChanged();
-                        adapterGroups.notifyDataSetChanged();
-                    }
+        // 2. Récupérer le nombre d'amis
+        db.collection("users").document(myUid).collection("Friends").get()
+                .addOnSuccessListener(snapshots -> {
+                    int count = snapshots.size();
+                    bottomFriendsCount.setText(String.valueOf(count));
                 });
     }
 
-    // Gardez votre méthode showAllUsersDialog existante telle quelle
-    // ...
-    private void showAllUsersDialog() {
+    private void setupRecyclerView() {
+        discussionList = new ArrayList<>();
+        fullDiscussionList = new ArrayList<>();
+        recyclerDiscussions.setLayoutManager(new LinearLayoutManager(this));
+
+        discussionAdapter = new DiscussionAdapter(discussionList, this, this::openChat, this::handleDeleteConversation);
+        recyclerDiscussions.setAdapter(discussionAdapter);
+    }
+
+    private void handleDeleteConversation(Discussion discussion) {
+        new AlertDialog.Builder(this)
+                .setTitle("Supprimer")
+                .setMessage("Supprimer la discussion avec " + discussion.getNom() + " ?")
+                .setPositiveButton("Oui", (dialog, which) -> deleteConversationFromFirestore(discussion))
+                .setNegativeButton("Non", null)
+                .show();
+    }
+
+    private void deleteConversationFromFirestore(Discussion discussion) {
+        if (myUid == null || discussion.getUid() == null) return;
+        db.collection("Conversations").document(myUid).collection("chats").document(discussion.getUid())
+                .delete()
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Supprimé", Toast.LENGTH_SHORT).show());
+    }
+
+    private void setupListeners() {
+        // Déconnexion
+        btnMenu.setOnClickListener(v -> {
+            updateUserStatus("offline");
+            mAuth.signOut();
+            Intent intent = new Intent(DiscussionActivity.this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+
+        // Nouveau message (Bouton flottant)
+        btnCompose.setOnClickListener(v -> showFriendsDialog());
+
+        // Ajouter ami (Header)
+        btnAddFriend.setOnClickListener(v -> {
+            startActivity(new Intent(DiscussionActivity.this, FindFriendsActivity.class));
+        });
+
+        // Recherche
+        etSearch.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void afterTextChanged(Editable s) { filter(s.toString()); }
+        });
+    }
+
+    private void updateUserStatus(String status) {
+        if (myUid != null) {
+            db.collection("users").document(myUid).update("status", status);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUserStatus("online");
+        loadUserProfileData(); // Recharger les infos (ex: si nbr amis change)
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (isFinishing()) {
+            updateUserStatus("offline");
+        }
+    }
+
+    private void chargerDiscussions() {
+        if (myUid == null) return;
+        db.collection("Conversations").document(myUid).collection("chats")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null || value == null) return;
+                    discussionList.clear();
+                    fullDiscussionList.clear();
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        if ("group".equals(doc.getString("type"))) continue;
+
+                        String uidDestinataire = doc.getString("uid");
+                        String nom = doc.getString("name");
+                        String dernierMessage = doc.getString("lastMessage");
+                        String imageUrl = doc.getString("imageUrl");
+                        String heureFormattee = "";
+                        Timestamp timestampObj = doc.getTimestamp("timestamp");
+                        if (timestampObj != null) {
+                            Date date = timestampObj.toDate();
+                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                            heureFormattee = sdf.format(date);
+                        }
+
+                        Discussion discussion = new Discussion(
+                                nom,
+                                dernierMessage != null ? dernierMessage : "",
+                                heureFormattee,
+                                imageUrl,
+                                false,
+                                uidDestinataire
+                        );
+                        discussionList.add(discussion);
+                    }
+                    fullDiscussionList.addAll(discussionList);
+                    discussionAdapter.notifyDataSetChanged();
+                });
+    }
+
+    private void openChat(Discussion discussion) {
+        if (discussion == null || discussion.getUid() == null) return;
+        Intent intent = new Intent(this, ChatActivity.class);
+        intent.putExtra("uid_destinataire", discussion.getUid());
+        intent.putExtra("nom_destinataire", discussion.getNom());
+        intent.putExtra("image_destinataire", discussion.getPhotoUrl());
+        startActivity(intent);
+    }
+
+    private void filter(String text) {
+        List<Discussion> filteredList = new ArrayList<>();
+        for (Discussion item : fullDiscussionList) {
+            if (item.getNom().toLowerCase().contains(text.toLowerCase())) {
+                filteredList.add(item);
+            }
+        }
+        discussionAdapter.filterList(filteredList);
+    }
+
+    private void showFriendsDialog() {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_new_chat);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         RecyclerView recyclerUsers = dialog.findViewById(R.id.recycler_all_users);
-        Button btnCancel = dialog.findViewById(R.id.btn_cancel_dialog);
-
         recyclerUsers.setLayoutManager(new LinearLayoutManager(this));
-        List<Discussion> userList = new ArrayList<>();
-
-        DiscussionAdapter userAdapter = new DiscussionAdapter(userList, this, new DiscussionAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(Discussion discussion) {
-                dialog.dismiss();
-                openChat(discussion); // Utiliser la méthode centralisée
-            }
-        });
+        List<Discussion> friendUserList = new ArrayList<>();
+        DiscussionAdapter userAdapter = new DiscussionAdapter(friendUserList, this, discussion -> {
+            dialog.dismiss();
+            openChat(discussion);
+        }, null);
         recyclerUsers.setAdapter(userAdapter);
 
-        // Charger TOUS les utilisateurs
         db.collection("users").document(myUid).collection("Friends").get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        userList.clear();
+                .addOnSuccessListener(friendDocs -> {
+                    if (friendDocs.isEmpty()) {
+                        Toast.makeText(this, "Ajoutez des amis d'abord !", Toast.LENGTH_SHORT).show();
+                    } else {
                         List<String> friendIds = new ArrayList<>();
-
-                        // 1. Récupérer les IDs des amis
-                        for (DocumentSnapshot doc : task.getResult()) {
-                            friendIds.add(doc.getId());
+                        for (DocumentSnapshot doc : friendDocs) friendIds.add(doc.getId());
+                        if (!friendIds.isEmpty()) {
+                            db.collection("users").whereIn("uid", friendIds).get()
+                                    .addOnSuccessListener(userDocs -> {
+                                        for(DocumentSnapshot userDoc : userDocs) {
+                                            Discussion friend = new Discussion(
+                                                    userDoc.getString("name"),
+                                                    "@" + userDoc.getString("pseudo"),
+                                                    "",
+                                                    userDoc.getString("image"),
+                                                    false,
+                                                    userDoc.getString("uid")
+                                            );
+                                            friendUserList.add(friend);
+                                        }
+                                        userAdapter.notifyDataSetChanged();
+                                    });
                         }
-
-                        if (friendIds.isEmpty()) {
-                            Toast.makeText(DiscussionActivity.this, "Vous n'avez pas encore d'amis.", Toast.LENGTH_SHORT).show();
-                            userAdapter.notifyDataSetChanged();
-                            return;
-                        }
-
-                        // 2. Charger les détails de ces amis (Nom, Image...)
-                        db.collection("users").get().addOnSuccessListener(allDocs -> {
-                            for (DocumentSnapshot doc : allDocs) {
-                                String uid = doc.getString("uid");
-                                if (friendIds.contains(uid)) { // SI C'EST UN AMI
-                                    String nom = doc.getString("name");
-                                    String image = doc.getString("image");
-                                    String pseudo = doc.getString("pseudo");
-
-                                    // Note : type null pour les users dans cette liste
-                                    userList.add(new Discussion(nom, "@" + pseudo, "", image, false, uid, null));
-                                }
-                            }
-                            userAdapter.notifyDataSetChanged();
-                        });
                     }
                 });
-
-        // Bouton pour aller chercher de nouveaux amis (Optionnel si déjà sur la page principale)
-        Button btnFindNew = dialog.findViewById(R.id.btn_find_new_friends);
-        if(btnFindNew != null) {
-            btnFindNew.setOnClickListener(v -> {
-                dialog.dismiss();
-                startActivity(new Intent(DiscussionActivity.this, FindFriendsActivity.class));
-            });
-        }
-
-        if(btnCancel != null) btnCancel.setOnClickListener(v -> dialog.dismiss());
-
+        dialog.findViewById(R.id.btn_cancel_dialog).setOnClickListener(v -> dialog.dismiss());
+        dialog.findViewById(R.id.btn_find_new_friends).setOnClickListener(v -> {
+            dialog.dismiss();
+            startActivity(new Intent(this, FindFriendsActivity.class));
+        });
         dialog.show();
     }
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Ombre subtile -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#1A000000" /> <!-- Noir avec 10% d'opacité -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- Fond blanc principal, avec la bordure -->
+    <item android:bottom="2dp" android:right="1dp" android:left="1dp">
+        <shape android:shape="rectangle">
+            <!-- Fond blanc -->
+            <solid android:color="@android:color/white" />
+
+            <!-- Bordure fine -->
+            <stroke
+                android:width="1dp"
+                android:color="#E0E0E0" /> <!-- Gris très clair -->
+
+            <!-- Coins arrondis -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+</layer-list>
