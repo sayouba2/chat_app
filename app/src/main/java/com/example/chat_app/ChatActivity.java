@@ -8,7 +8,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import android.content.Intent;
+import android.net.Uri;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,7 +24,10 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -30,14 +40,15 @@ import java.util.List;
 import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
-
+    private ValueEventListener seenListener;
+    private DatabaseReference userRefForSeen;
     // Vues (maintenant déclarées au niveau de la classe)
     private ImageButton btnBack, btnSend;
     private EditText msgInput;
     private TextView pseudoTv; // <--- Correctement déclaré
     private ImageView profileIv;
     private RecyclerView recyclerView;
-
+    private static final int PICK_IMAGE_REQUEST = 1;
     // Données de l'utilisateur actuel (MOI)
     private String myName;
     private String myImage;
@@ -54,7 +65,23 @@ public class ChatActivity extends AppCompatActivity {
     // Adapter
     private ChatAdapter chatAdapter;
     private List<ChatMessage> messageList;
+    private void seenMessage(String userId) {
+        // On cherche les messages envoyés par L'AUTRE dans notre conversation
+        // Attention : Firestore facture les écritures. Cette méthode mettra à jour tous les messages non lus.
 
+        db.collection("chats").document(chatRoomId).collection("messages")
+                .whereEqualTo("senderId", otherUid) // Seulement ceux que l'autre a envoyé
+                .whereEqualTo("isSeen", false)      // Seulement ceux pas encore vus
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        for (DocumentSnapshot doc : task.getResult()) {
+                            // On met à jour le champ isSeen à true
+                            doc.getReference().update("isSeen", true);
+                        }
+                    }
+                });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,17 +138,24 @@ public class ChatActivity extends AppCompatActivity {
 
         // Actions
         btnBack.setOnClickListener(v -> finish());
-
+        ImageButton btnFile = findViewById(R.id.file);
+        btnFile.setOnClickListener(v -> openFileChooser());
         btnSend.setOnClickListener(v -> {
             String msg = msgInput.getText().toString();
             if (!TextUtils.isEmpty(msg)) {
-                sendMessage(myUid, otherUid, msg);
+                sendMessage(myUid, otherUid, msg, "text"); // On précise que c'est du texte
             }
         });
 
         readMessages();
+        seenMessage(otherUid);
     }
-
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
     private void initViews() {
         btnBack = findViewById(R.id.btn_back);
         btnSend = findViewById(R.id.send);
@@ -153,26 +187,64 @@ public class ChatActivity extends AppCompatActivity {
         return convMap;
     }
 
-    private void sendMessage(String sender, String receiver, String message) {
-        ChatMessage chatMessage = new ChatMessage(sender, receiver, message, new Timestamp(new Date()));
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        // 1. Ajouter message dans la collection "chats -> [roomID] -> messages"
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri imageUri = data.getData();
+
+            try {
+                // Conversion URI -> Bitmap
+                InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+                // IMPORTANT : Redimensionner l'image car Base64 est très lourd
+                // Firestore limite les documents à 1MB. Une photo HD fera planter l'appli.
+                Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+
+                // Conversion Bitmap -> String Base64
+                String base64Image = encodeImage(resizedBitmap);
+
+                // Envoi immédiat
+                sendMessage(myUid, otherUid, base64Image, "image");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(this, "Erreur lors de l'envoi de l'image", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // Fonction utilitaire de conversion
+    private String encodeImage(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        // Compression en JPEG qualité 50% pour réduire la taille
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, byteArrayOutputStream);
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
+
+    // MODIFIEZ votre fonction sendMessage pour accepter le TYPE
+    private void sendMessage(String sender, String receiver, String message, String type) {
+        // On passe le type au constructeur
+        ChatMessage chatMessage = new ChatMessage(sender, receiver, message, new Timestamp(new Date()), type, false);
+
         db.collection("chats").document(chatRoomId).collection("messages")
                 .add(chatMessage);
 
-        // 2. Mise à jour de la liste de conversations pour MOI (Sender)
-        db.collection("Conversations").document(sender).collection("chats").document(receiver)
-                .set(createConversationMap(receiver, receiverName, message, receiverImage)); // Utilise les variables globales receiverName/Image
+        // Pour la liste des conversations, on affiche "Photo" si c'est une image
+        String lastMsgPreview = type.equals("image") ? "📷 Photo" : message;
 
-        // 3. Mise à jour de la liste de conversations pour L'AUTRE (Receiver)
-        // Note: myName et myImage sont utilisés ici, ils doivent avoir été chargés par loadCurrentUserData
+        // Mise à jour conversations (Sender)
+        db.collection("Conversations").document(sender).collection("chats").document(receiver)
+                .set(createConversationMap(receiver, receiverName, lastMsgPreview, receiverImage));
+
+        // Mise à jour conversations (Receiver)
         if (myName != null && myImage != null) {
             db.collection("Conversations").document(receiver).collection("chats").document(sender)
-                    .set(createConversationMap(sender, myName, message, myImage));
-        } else {
-            Toast.makeText(this, "Erreur: Mes données ne sont pas encore chargées. Réessayez.", Toast.LENGTH_SHORT).show();
+                    .set(createConversationMap(sender, myName, lastMsgPreview, myImage));
         }
-
 
         msgInput.setText("");
     }
@@ -185,6 +257,11 @@ public class ChatActivity extends AppCompatActivity {
                     if (value != null) {
                         for (DocumentChange dc : value.getDocumentChanges()) {
                             if (dc.getType() == DocumentChange.Type.ADDED) {
+                                ChatMessage msg = dc.getDocument().toObject(ChatMessage.class);
+                                if (msg.getSenderId().equals(otherUid)) {
+                                    seenMessage(otherUid);
+                                }
+
                                 messageList.add(dc.getDocument().toObject(ChatMessage.class));
                                 chatAdapter.notifyItemInserted(messageList.size() - 1);
                                 recyclerView.smoothScrollToPosition(messageList.size() - 1);
@@ -192,5 +269,7 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     }
                 });
+
     }
+
 }

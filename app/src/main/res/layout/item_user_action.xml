@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:background="@drawable/white_background_rounded"
+    android:layout_marginBottom="5dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_user_avatar"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/profile"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/tv_user_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="Nom Utilisateur"
+        android:textStyle="bold"
+        android:textColor="#000"
+        app:layout_constraintStart_toEndOf="@id/img_user_avatar"
+        app:layout_constraintTop_toTopOf="@id/img_user_avatar"
+        app:layout_constraintEnd_toStartOf="@id/btn_action_user"/>
+
+    <TextView
+        android:id="@+id/tv_user_status"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:text="En ligne"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@id/img_user_avatar"
+        app:layout_constraintTop_toBottomOf="@id/tv_user_name"
+        app:layout_constraintEnd_toStartOf="@id/btn_action_user"/>
+
+    <!-- Ce bouton changera de texte et de couleur selon l'état -->
+    <Button
+        android:id="@+id/btn_action_user"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:text="Ajouter"
+        android:textSize="12sp"
+        android:backgroundTint="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,35 +1,41 @@
 package com.example.chat_app;
-// Vérifie que c'est le bon nom de ton package
 
 public class Discussion {
-    private String status; // "online" ou "offline"
-    // Ajoutez le getter et le setter
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    private String status;
     private String nom;
     private String dernierMessage;
     private String heure;
-    private String photoUrl; // C'était int avant, c'est String maintenant !
+    private String photoUrl;
     private boolean isNonLu;
-    private String uid; // Utile pour savoir à qui on parle
+    private String uid;
+    private String type; // Le champ qui manquait dans le constructeur
 
-    // Constructeur vide (Requis par Firebase parfois)
+    // Constructeur vide (Requis par Firebase)
     public Discussion() { }
 
-    public Discussion(String nom, String dernierMessage, String heure, String photoUrl, boolean isNonLu, String uid) {
+    // --- C'EST ICI LA CORRECTION ---
+    // On ajoute "String type" à la fin des parenthèses
+    public Discussion(String nom, String dernierMessage, String heure, String photoUrl, boolean isNonLu, String uid, String type) {
         this.nom = nom;
         this.dernierMessage = dernierMessage;
         this.heure = heure;
         this.photoUrl = photoUrl;
         this.isNonLu = isNonLu;
         this.uid = uid;
+        this.type = type; // On assigne la valeur reçue
     }
 
-    // Getters
+    // Getters et Setters
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
     public String getNom() { return nom; }
     public String getDernierMessage() { return dernierMessage; }
     public String getHeure() { return heure; }
     public String getPhotoUrl() { return photoUrl; }
     public boolean isNonLu() { return isNonLu; }
     public String getUid() { return uid; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 }

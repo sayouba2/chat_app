@@ -25,7 +25,10 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
     public interface OnItemClickListener {
         void onItemClick(Discussion discussion);
     }
-
+    public void filterList(List<Discussion> filteredList) {
+        this.discussionList = filteredList;
+        notifyDataSetChanged();
+    }
     private List<Discussion> discussionList;
     private Context context;
     private OnItemClickListener listener;

@@ -20,11 +20,19 @@
         android:layout_width="match_parent"
         android:layout_height="300dp" />
     <Button
+        android:id="@+id/btn_find_new_friends"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Trouver de nouveaux amis"
+        android:backgroundTint="@color/colorPrimary"
+        android:layout_marginTop="10dp"/>
+
+    <Button
         android:id="@+id/btn_cancel_dialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Annuler"
         android:backgroundTint="#CCCCCC"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="5dp"/>
 
 </LinearLayout>
