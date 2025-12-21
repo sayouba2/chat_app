@@ -1,6 +1,8 @@
 package com.example.chat_app;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -12,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +34,9 @@ public class navbarActivity extends AppCompatActivity {
     protected CircleImageView headerImage;
     protected TextView headerPseudo;
     protected TextView headerNbrAmis;
+    // Variable base de donnée :
+    private FirebaseFirestore db;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +68,9 @@ public class navbarActivity extends AppCompatActivity {
         setupNavigationDrawer();
         // 7. Modification des element Entete
         setupNavigationHeader();
+
+
+
     }
 
     private void setupNavigationDrawer() {
@@ -71,10 +82,27 @@ public class navbarActivity extends AppCompatActivity {
                 // En Java moderne sur Android, on utilise if/else pour les IDs
                 // car "switch" pose parfois problème avec les dernières versions de Gradle
                 if (id == R.id.home_view) {
+                    Intent intent =new Intent(navbarActivity.this, DiscussionActivity.class);
+                    startActivity(intent);
                     Toast.makeText(navbarActivity.this, "Home", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.profil_view) {
+                    Intent intent =new Intent(navbarActivity.this, UserInformations.class);
+                    startActivity(intent);
                     Toast.makeText(navbarActivity.this, "Mes Infos", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.logout) {
+                    // 1. Appel à Firebase pour déconnecter la session
+                    FirebaseAuth.getInstance().signOut();
+
+// 2. Redirection vers l'écran de connexion (MainActivity par exemple)
+                    Intent intent = new Intent(navbarActivity.this, LoginActivity.class);
+
+// 3. IMPORTANT : Vider la pile d'activités
+// Cela empêche l'utilisateur de cliquer sur "Retour" et de revenir dans le chat sans être connecté.
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                    startActivity(intent);
+                    finish();
+
                     Toast.makeText(navbarActivity.this, "Déconnecter", Toast.LENGTH_SHORT).show();
                 } else if (id == R.id.share) {
                     Toast.makeText(navbarActivity.this, "Partager", Toast.LENGTH_SHORT).show();
@@ -93,18 +121,56 @@ public class navbarActivity extends AppCompatActivity {
         // On vérifie qu'il y a bien un header pour éviter un crash
         if (navigationView.getHeaderCount() > 0) {
             View header = navigationView.getHeaderView(0);
+            headerImage = header.findViewById(R.id.imageHeader);
+            headerPseudo = header.findViewById(R.id.pseudo);
+            headerNbrAmis = header.findViewById(R.id.nbrAmis);
 
+            // 1. Récupérer l'utilisateur actuel
+            com.google.firebase.auth.FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
             // Image
-            de.hdodenhof.circleimageview.CircleImageView image = header.findViewById(R.id.imageHeader);
-            image.setImageResource(R.drawable.img);
+//            de.hdodenhof.circleimageview.CircleImageView image = header.findViewById(R.id.imageHeader);
+//            image.setImageResource(R.drawable.img);
+//
+//            // Pseudo
+//            TextView pseudo = header.findViewById(R.id.pseudo);
+//            pseudo.setText("Pseudo_m_09");
+//
+//            // Amis
+//            TextView nbrAmis = header.findViewById(R.id.nbrAmis);
+//            nbrAmis.setText("230");
+            headerImage.setImageResource(R.drawable.profile);
+            if (user != null) {
+                String uid = user.getUid();
 
-            // Pseudo
-            TextView pseudo = header.findViewById(R.id.pseudo);
-            pseudo.setText("Pseudo_m_09");
+                // 2. Récupérer le pseudo depuis Firestore (Collection "users")
+                db.collection("users").document(uid).get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                String pseudoFirebase = documentSnapshot.getString("pseudo");
+                                headerPseudo.setText(pseudoFirebase != null ? pseudoFirebase : "Utilisateur");
 
-            // Amis
-            TextView nbrAmis = header.findViewById(R.id.nbrAmis);
-            nbrAmis.setText("230");
+                                // Si tu as une URL d'image dans Firestore, tu peux charger l'image ici avec Glide ou Picasso
+                                // String imageUrl = documentSnapshot.getString("image");
+                            }
+                        });
+
+                // 3. Récupérer le nombre de discussions
+                // Hypothèse : Tes discussions sont dans une collection "discussions"
+                // où l'UID de l'utilisateur est présent dans une liste "participants"
+                db.collection("chatRooms")
+                        .get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                // task.getResult().size() renvoie le nombre total de documents dans la collection
+                                int totalDocuments = task.getResult().size();
+                                headerNbrAmis.setText(String.valueOf(totalDocuments));
+                                Log.d("DEBUG_COUNT", "Total de documents dans chatRooms : " + totalDocuments);
+                            } else {
+                                Log.e("DEBUG_COUNT", "Erreur : ", task.getException());
+                            }
+                        });
+            }
         }
     }
 

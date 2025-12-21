@@ -67,11 +67,13 @@
             android:fontFamily="cursive"
             android:textColor="@color/colorBackground"
             android:textStyle="bold"
+            android:visibility="gone"
             android:layout_gravity="top"
             tools:text="1234" />
 
         <TextView
             android:id="@+id/followers"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Amis"

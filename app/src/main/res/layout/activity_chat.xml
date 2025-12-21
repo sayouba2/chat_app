@@ -19,14 +19,16 @@
         tools:ignore="RtlSymmetry">
 
         <ImageButton
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:id="@+id/btn_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="10dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Retour"
             android:scaleType="centerInside"
-            android:src="@drawable/back" />
+            android:src="@drawable/back"
+            android:padding="10dp" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="50dp"
@@ -41,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img" />
+                android:src="@drawable/profile" />
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -68,12 +70,14 @@
             app:tint="@color/colorTextOnPrimary" />
     </LinearLayout>
 
-    <ScrollView
-        android:id="@+id/chat_content"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical" />
+        android:background="@color/colorBackground"
+        android:paddingBottom="10dp"
+        android:clipToPadding="false"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -94,7 +98,6 @@
             android:orientation="horizontal"
             android:paddingTop="2dp"
             android:paddingBottom="2dp">
-
 
             <ImageButton
                 android:id="@+id/stick"

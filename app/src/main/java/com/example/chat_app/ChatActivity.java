@@ -1,71 +1,189 @@
 package com.example.chat_app;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChatActivity extends navbarActivity {
+
+    // Vues (maintenant déclarées au niveau de la classe)
+    private ImageButton btnBack, btnSend;
+    private EditText msgInput;
+    private TextView pseudoTv; // <--- Correctement déclaré
+    private ImageView profileIv;
+    private RecyclerView recyclerView;
+
+    // Données de l'utilisateur actuel (MOI)
+    private String myName;
+    private String myImage;
+
+    // Données du destinataire (Maintenant globales pour sendMessage)
+    private String receiverName; // <--- Correctement déclaré
+    private String receiverImage; // <--- Correctement déclaré
+
+    // Firebase & Data
+    private FirebaseFirestore db;
+    private FirebaseAuth mAuth;
+    private String myUid, otherUid, chatRoomId;
+
+    // Adapter
+    private ChatAdapter chatAdapter;
+    private List<ChatMessage> messageList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_chat);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.chat_main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        TextView userName = findViewById(R.id.pseudo);
-        ImageView userProfile = findViewById(R.id.image_profile);
-        String name = getIntent().getStringExtra("NOM_USER");
-        int resImg = getIntent().getIntExtra("IMG_USER", R.drawable.img);
-        userName.setText(name);
-        userProfile.setImageResource(resImg);
-        // 1. On récupère le bouton (les 3 points) via son ID défini dans le XML layout
-        ImageView btnMenu = findViewById(R.id.chat_menu);
+        // Init Firebase
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
-// 2. On écoute le clic sur l'image
-        btnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 3. On crée le PopupMenu. 'MainActivity.this' est le contexte, 'v' est l'ancre (le bouton)
-                PopupMenu popup = new PopupMenu(ChatActivity.this, v);
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            // Gérer le cas où l'utilisateur n'est pas connecté
+            finish();
+            return;
+        }
+        myUid = currentUser.getUid();
 
-                // 4. On lie le fichier XML de menu (menu_options.xml)
-                popup.getMenuInflater().inflate(R.menu.chat_menu, popup.getMenu());
+        // Récup des infos (envoyées par DiscussionActivity)
+        otherUid = getIntent().getStringExtra("uid_destinataire");
+        receiverName = getIntent().getStringExtra("nom_destinataire"); // Attribution à la variable globale
+        receiverImage = getIntent().getStringExtra("image_destinataire"); // Attribution à la variable globale
 
-                // 5. On gère les clics sur les options (Modifier, Supprimer...)
-                /*popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        // On vérifie quel item a été cliqué via son ID
-                        int id = item.getItemId();
+        // Générer ID conversation unique (A_B ou B_A)
+        if (myUid.compareTo(otherUid) < 0) chatRoomId = myUid + "_" + otherUid;
+        else chatRoomId = otherUid + "_" + myUid;
 
-                        if (id == R.id.action_edit) {
-                            Toast.makeText(MainActivity.this, "Action: Modifier", Toast.LENGTH_SHORT).show();
-                            return true;
-                        } else if (id == R.id.action_delete) {
-                            Toast.makeText(MainActivity.this, "Action: Supprimer", Toast.LENGTH_SHORT).show();
-                            return true;
-                        }
-                        return false;
-                    }
-                });*/
+        initViews();
 
-                // 6. IMPORTANT : Ne pas oublier d'afficher le menu !
-                popup.show();
+        // Remplir header immédiatement
+        pseudoTv.setText(receiverName);
+        if (receiverImage != null && !receiverImage.equals("default")) {
+            Glide.with(this).load(receiverImage).into(profileIv);
+        }
+
+        // Charger les données MOI en arrière-plan (myName, myImage)
+        loadCurrentUserData();
+
+        // Setup RecyclerView
+        recyclerView.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager.setStackFromEnd(true); // Commencer par le bas
+        recyclerView.setLayoutManager(linearLayoutManager);
+
+        messageList = new ArrayList<>();
+        chatAdapter = new ChatAdapter(ChatActivity.this, messageList);
+        recyclerView.setAdapter(chatAdapter);
+
+        // Actions
+        btnBack.setOnClickListener(v -> finish());
+
+        btnSend.setOnClickListener(v -> {
+            String msg = msgInput.getText().toString();
+            if (!TextUtils.isEmpty(msg)) {
+                sendMessage(myUid, otherUid, msg);
             }
         });
 
+        readMessages();
+    }
+
+    private void initViews() {
+        btnBack = findViewById(R.id.btn_back);
+        btnSend = findViewById(R.id.send);
+        msgInput = findViewById(R.id.message_input);
+        pseudoTv = findViewById(R.id.pseudo); // <--- Correspond à la variable de classe
+        profileIv = findViewById(R.id.image_profile);
+        recyclerView = findViewById(R.id.recycler_chat);
+    }
+
+    // Récupère mon nom et ma photo pour mettre à jour la liste des conversations de l'autre
+    private void loadCurrentUserData() {
+        db.collection("users").document(myUid).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        myName = documentSnapshot.getString("name");
+                        myImage = documentSnapshot.getString("image");
+                        // Les variables globales sont maintenant remplies
+                    }
+                });
+    }
+
+    private Map<String, Object> createConversationMap(String otherUid, String otherName, String lastMessage, String otherImage) {
+        Map<String, Object> convMap = new HashMap<>();
+        convMap.put("uid", otherUid);
+        convMap.put("name", otherName);
+        convMap.put("lastMessage", lastMessage);
+        convMap.put("imageUrl", otherImage);
+        convMap.put("timestamp", new Timestamp(new Date()));
+        return convMap;
+    }
+
+    private void sendMessage(String sender, String receiver, String message) {
+        ChatMessage chatMessage = new ChatMessage(sender, receiver, message, new Timestamp(new Date()));
+
+        // 1. Ajouter message dans la collection "chats -> [roomID] -> messages"
+        db.collection("chats").document(chatRoomId).collection("messages")
+                .add(chatMessage);
+
+        // 2. Mise à jour de la liste de conversations pour MOI (Sender)
+        db.collection("Conversations").document(sender).collection("chats").document(receiver)
+                .set(createConversationMap(receiver, receiverName, message, receiverImage)); // Utilise les variables globales receiverName/Image
+
+        // 3. Mise à jour de la liste de conversations pour L'AUTRE (Receiver)
+        // Note: myName et myImage sont utilisés ici, ils doivent avoir été chargés par loadCurrentUserData
+        if (myName != null && myImage != null) {
+            db.collection("Conversations").document(receiver).collection("chats").document(sender)
+                    .set(createConversationMap(sender, myName, message, myImage));
+        } else {
+            Toast.makeText(this, "Erreur: Mes données ne sont pas encore chargées. Réessayez.", Toast.LENGTH_SHORT).show();
+        }
+
+
+        msgInput.setText("");
+    }
+
+    private void readMessages() {
+        db.collection("chats").document(chatRoomId).collection("messages")
+                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) return;
+                    if (value != null) {
+                        for (DocumentChange dc : value.getDocumentChanges()) {
+                            if (dc.getType() == DocumentChange.Type.ADDED) {
+                                messageList.add(dc.getDocument().toObject(ChatMessage.class));
+                                chatAdapter.notifyItemInserted(messageList.size() - 1);
+                                recyclerView.smoothScrollToPosition(messageList.size() - 1);
+                            }
+                        }
+                    }
+                });
     }
 }

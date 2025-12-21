@@ -166,16 +166,18 @@
                             android:inputType="textPassword" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <Button
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/login_button"
                         android:layout_width="match_parent"
                         android:layout_height="60dp"
-                        android:backgroundTint="@color/colorPrimaryDark"
-                        android:elevation="4dp"
                         android:text="@string/button_create_account"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        app:cornerRadius="30dp" />
+                        android:elevation="4dp"
+                        app:backgroundTint="@color/colorPrimaryDark"
+                        app:cornerRadius="30dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/password_layout" />
 
                 </LinearLayout>
 
