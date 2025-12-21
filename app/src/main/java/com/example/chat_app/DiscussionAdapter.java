@@ -12,6 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide; // <--- IMPORTANT : Import Glide
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -20,7 +25,10 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
     public interface OnItemClickListener {
         void onItemClick(Discussion discussion);
     }
-
+    public void filterList(List<Discussion> filteredList) {
+        this.discussionList = filteredList;
+        notifyDataSetChanged();
+    }
     private List<Discussion> discussionList;
     private Context context;
     private OnItemClickListener listener;
@@ -52,14 +60,24 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
         // On vérifie si l'URL est valide, sinon on met l'image par défaut
         String photoUrl = discussion.getPhotoUrl();
 
-        if (photoUrl != null && !photoUrl.isEmpty() && !photoUrl.equals("default")) {
-            Glide.with(context)
-                    .load(photoUrl)
-                    .placeholder(R.drawable.profile) // Image pendant le chargement
-                    .circleCrop() // Arrondir l'image
-                    .into(holder.imgAvatar);
+        if (photoUrl != null && !photoUrl.isEmpty()) {
+            if (photoUrl.startsWith("http")) {
+                // C'est une URL Internet (Galerie ou Profil user)
+                Glide.with(context).load(photoUrl).placeholder(R.drawable.profile).into(holder.imgAvatar);
+            } else {
+                // C'est une image locale (groupe_image_1, etc.)
+                // On cherche l'ID de la ressource drawable à partir du nom string
+                int resId = context.getResources().getIdentifier(photoUrl, "drawable", context.getPackageName());
+
+                if (resId != 0) {
+                    // L'image existe dans vos drawables
+                    holder.imgAvatar.setImageResource(resId);
+                } else {
+                    // Image introuvable, on met celle par défaut
+                    holder.imgAvatar.setImageResource(R.drawable.groupe_image_1);
+                }
+            }
         } else {
-            // Si pas d'image sur Firebase, on met celle par défaut des ressources
             holder.imgAvatar.setImageResource(R.drawable.profile);
         }
 
@@ -78,6 +96,26 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
         holder.itemView.setOnClickListener(v -> {
             listener.onItemClick(discussion);
         });
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("UsersStatus").child(discussion.getUid());
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String status = snapshot.child("status").getValue(String.class);
+                    if ("online".equals(status)) {
+                        // Affichez une petite pastille verte (imageView) que vous devez ajouter dans item_discussion.xml
+                        holder.imgStatusOn.setVisibility(View.VISIBLE);
+                        holder.imgStatusOff.setVisibility(View.GONE);
+                    } else {
+                        holder.imgStatusOn.setVisibility(View.GONE);
+                        holder.imgStatusOff.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
     }
 
     @Override
@@ -88,13 +126,16 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView txtNom, txtMessage, txtHeure;
         public ImageView imgAvatar;
-
+        public View imgStatusOn;
+        public View imgStatusOff;
         public ViewHolder(View itemView) {
             super(itemView);
             txtNom = itemView.findViewById(R.id.txtNom);
             txtMessage = itemView.findViewById(R.id.txtMessage);
             txtHeure = itemView.findViewById(R.id.txtHeure);
             imgAvatar = itemView.findViewById(R.id.imgAvatar);
+            imgStatusOn = itemView.findViewById(R.id.img_status_on);
+            imgStatusOff = itemView.findViewById(R.id.img_status_off);
         }
     }
 }
