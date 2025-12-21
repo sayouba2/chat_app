@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.glide)
+    implementation(libs.play.services.tasks)
 
 
     testImplementation(libs.junit)

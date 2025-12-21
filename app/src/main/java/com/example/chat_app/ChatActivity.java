@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends navbarActivity {
 
     // Vues (maintenant déclarées au niveau de la classe)
     private ImageButton btnBack, btnSend;
