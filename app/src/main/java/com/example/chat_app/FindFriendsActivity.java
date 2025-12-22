@@ -42,15 +42,12 @@ public class FindFriendsActivity extends AppCompatActivity {
         sentRequestsIds = new ArrayList<>();
         receivedRequestsIds = new ArrayList<>();
 
-        // On initialise l'adapter
         adapter = new FindFriendsAdapter(this, allUsers, friendsListIds, sentRequestsIds, receivedRequestsIds);
         recyclerView.setAdapter(adapter);
 
-        // Chargement des données en cascade
         loadMyFriends();
     }
 
-    // 1. Charger mes amis existants
     private void loadMyFriends() {
         if (myUid == null) return;
 
@@ -64,7 +61,6 @@ public class FindFriendsActivity extends AppCompatActivity {
                 });
     }
 
-    // 2. Charger les demandes que j'ai envoyées
     private void loadSentRequests() {
         db.collection("FriendRequests").whereEqualTo("from", myUid).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -76,7 +72,6 @@ public class FindFriendsActivity extends AppCompatActivity {
                 });
     }
 
-    // 3. Charger les demandes que j'ai reçues
     private void loadReceivedRequests() {
         db.collection("FriendRequests").whereEqualTo("to", myUid).get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -88,22 +83,21 @@ public class FindFriendsActivity extends AppCompatActivity {
                 });
     }
 
-    // 4. Charger enfin tous les utilisateurs pour afficher la liste
     private void loadAllUsers() {
         db.collection("users").get().addOnSuccessListener(queryDocumentSnapshots -> {
             allUsers.clear();
 
             for (DocumentSnapshot doc : queryDocumentSnapshots) {
                 String uid = doc.getString("uid");
-                // Vérifier que uid n'est pas null et que ce n'est pas moi
+
                 if (uid != null && !uid.equals(myUid)) {
                     String nom = doc.getString("name");
                     String pseudo = doc.getString("pseudo");
                     String image = doc.getString("image");
 
                     // --- CORRECTION ICI ---
-                    // Ajout de 'null' comme dernier paramètre pour le type
-                    Discussion user = new Discussion(nom, "@" + pseudo, "", image, false, uid, null);
+                    // On utilise le constructeur à 6 paramètres, sans le type.
+                    Discussion user = new Discussion(nom, "@" + pseudo, "", image, false, uid);
 
                     allUsers.add(user);
                 }

@@ -20,9 +20,6 @@
             android:name=".FindFriendsActivity"
             android:exported="false" />
         <activity
-            android:name=".CreateGroupActivity"
-            android:exported="false" />
-        <activity
             android:name=".DiscussionActivity"
             android:exported="false" />
         <activity

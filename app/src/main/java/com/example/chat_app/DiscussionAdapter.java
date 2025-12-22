@@ -1,42 +1,55 @@
 package com.example.chat_app;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide; // <--- IMPORTANT : Import Glide
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.List;
 
 public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.ViewHolder> {
 
+    // Interfaces pour les clics
     public interface OnItemClickListener {
         void onItemClick(Discussion discussion);
     }
+
+    // --- NOUVELLE INTERFACE POUR L'APPUI LONG ---
+    public interface OnItemLongClickListener {
+        void onItemLongClick(Discussion discussion);
+    }
+
+    private List<Discussion> discussionList;
+    private Context context;
+    private OnItemClickListener clickListener;
+    private OnItemLongClickListener longClickListener; // Nouvelle variable
+
+    // --- CONSTRUCTEUR MIS À JOUR ---
+    public DiscussionAdapter(List<Discussion> discussionList, Context context, OnItemClickListener clickListener, OnItemLongClickListener longClickListener) {
+        this.discussionList = discussionList;
+        this.context = context;
+        this.clickListener = clickListener;
+        this.longClickListener = longClickListener; // Initialisation
+    }
+
     public void filterList(List<Discussion> filteredList) {
         this.discussionList = filteredList;
         notifyDataSetChanged();
-    }
-    private List<Discussion> discussionList;
-    private Context context;
-    private OnItemClickListener listener;
-
-    public DiscussionAdapter(List<Discussion> discussionList, Context context, OnItemClickListener listener) {
-        this.discussionList = discussionList;
-        this.context = context;
-        this.listener = listener;
     }
 
     @NonNull
@@ -51,70 +64,54 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Discussion discussion = discussionList.get(position);
 
-        // 1. Textes
         holder.txtNom.setText(discussion.getNom());
         holder.txtMessage.setText(discussion.getDernierMessage());
         holder.txtHeure.setText(discussion.getHeure());
 
-        // 2. Gestion de l'Image avec GLIDE (Internet)
-        // On vérifie si l'URL est valide, sinon on met l'image par défaut
+        // --- GESTION IMAGE ---
         String photoUrl = discussion.getPhotoUrl();
-
         if (photoUrl != null && !photoUrl.isEmpty()) {
-            if (photoUrl.startsWith("http")) {
-                // C'est une URL Internet (Galerie ou Profil user)
-                Glide.with(context).load(photoUrl).placeholder(R.drawable.profile).into(holder.imgAvatar);
-            } else {
-                // C'est une image locale (groupe_image_1, etc.)
-                // On cherche l'ID de la ressource drawable à partir du nom string
+            if (photoUrl.startsWith("http")) { // Image de la galerie
+                Glide.with(context).load(photoUrl).placeholder(R.drawable.img).into(holder.imgAvatar);
+            } else { // Image prédéfinie (ex: "img_1")
                 int resId = context.getResources().getIdentifier(photoUrl, "drawable", context.getPackageName());
-
-                if (resId != 0) {
-                    // L'image existe dans vos drawables
-                    holder.imgAvatar.setImageResource(resId);
-                } else {
-                    // Image introuvable, on met celle par défaut
-                    holder.imgAvatar.setImageResource(R.drawable.groupe_image_1);
-                }
+                holder.imgAvatar.setImageResource(resId != 0 ? resId : R.drawable.img);
             }
         } else {
-            holder.imgAvatar.setImageResource(R.drawable.profile);
+            holder.imgAvatar.setImageResource(R.drawable.img); // Image par défaut
         }
 
-        // 3. Gestion du "Non Lu"
-        if (discussion.isNonLu()) { // J'ai corrigé "isEstNonLu" par "isNonLu" selon ton modèle
-            holder.txtMessage.setTypeface(null, Typeface.BOLD);
-            holder.txtMessage.setTextColor(context.getResources().getColor(android.R.color.black));
-            holder.txtNom.setTypeface(null, Typeface.BOLD);
-        } else {
-            holder.txtMessage.setTypeface(null, Typeface.NORMAL);
-            holder.txtMessage.setTextColor(context.getResources().getColor(android.R.color.darker_gray));
-            holder.txtNom.setTypeface(null, Typeface.BOLD);
+        // --- GESTION STATUT EN LIGNE ---
+        if (discussion.getUid() != null) {
+            FirebaseFirestore.getInstance().collection("users").document(discussion.getUid())
+                    .addSnapshotListener((snapshot, error) -> {
+                        if (error != null || snapshot == null || !snapshot.exists()) {
+                            holder.imgStatusOn.setVisibility(View.GONE);
+                            holder.imgStatusOff.setVisibility(View.VISIBLE);
+                            return;
+                        }
+
+                        String status = snapshot.getString("status");
+                        if ("online".equals(status)) {
+                            holder.imgStatusOn.setVisibility(View.VISIBLE);
+                            holder.imgStatusOff.setVisibility(View.GONE);
+                        } else {
+                            holder.imgStatusOn.setVisibility(View.GONE);
+                            holder.imgStatusOff.setVisibility(View.VISIBLE);
+                        }
+                    });
         }
 
-        // 4. Clic
-        holder.itemView.setOnClickListener(v -> {
-            listener.onItemClick(discussion);
-        });
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("UsersStatus").child(discussion.getUid());
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    String status = snapshot.child("status").getValue(String.class);
-                    if ("online".equals(status)) {
-                        // Affichez une petite pastille verte (imageView) que vous devez ajouter dans item_discussion.xml
-                        holder.imgStatusOn.setVisibility(View.VISIBLE);
-                        holder.imgStatusOff.setVisibility(View.GONE);
-                    } else {
-                        holder.imgStatusOn.setVisibility(View.GONE);
-                        holder.imgStatusOff.setVisibility(View.VISIBLE);
-                    }
-                }
+        // --- GESTION DES CLICS ---
+        holder.itemView.setOnClickListener(v -> clickListener.onItemClick(discussion));
+
+        // --- GESTION DE L'APPUI LONG ---
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onItemLongClick(discussion);
+                return true; // Indique que le clic long a été géré
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            return false;
         });
     }
 
@@ -126,8 +123,8 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView txtNom, txtMessage, txtHeure;
         public ImageView imgAvatar;
-        public View imgStatusOn;
-        public View imgStatusOff;
+        public View imgStatusOn, imgStatusOff;
+
         public ViewHolder(View itemView) {
             super(itemView);
             txtNom = itemView.findViewById(R.id.txtNom);

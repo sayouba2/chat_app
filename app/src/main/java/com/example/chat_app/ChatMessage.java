@@ -1,6 +1,7 @@
 package com.example.chat_app;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.database.Exclude;
 
 public class ChatMessage {
     private String senderId;
@@ -9,6 +10,8 @@ public class ChatMessage {
     private Timestamp timestamp;
     private boolean isSeen;
     private String type;
+    @Exclude
+    private String documentId;
     public ChatMessage() { } // Requis pour Firebase
     public ChatMessage(String senderId, String receiverId, String message, Timestamp timestamp, String type, boolean isSeen) {
         this.senderId = senderId;
@@ -24,4 +27,7 @@ public class ChatMessage {
     public String getType() { return type; }
     public boolean isSeen() { return isSeen; }
     public void setSeen(boolean seen) { isSeen = seen; }
+    @Exclude
+    public String getDocumentId() { return documentId; }
+    public void setDocumentId(String documentId) { this.documentId = documentId; }
 }
