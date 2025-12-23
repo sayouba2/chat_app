@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/white_background_rounded">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choisissez votre Avatar"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="20dp"
+        android:textColor="@color/colorPrimary"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="300dp">
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:rowCount="3"
+            android:alignmentMode="alignMargins"
+            android:layout_gravity="center_horizontal">
+
+            <!-- Image de base "img" -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_img"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img"
+                android:layout_margin="10dp"/>
+
+            <!-- Images img_1 à img_8 -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_1"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img_1"
+                android:layout_margin="10dp"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_2"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img_2"
+                android:layout_margin="10dp"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_3"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img_3"
+                android:layout_margin="10dp"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_4"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img_4"
+                android:layout_margin="10dp"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_5"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img_5"
+                android:layout_margin="10dp"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_6"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img_6"
+                android:layout_margin="10dp"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_7"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img_7"
+                android:layout_margin="10dp"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar_8"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/img_8"
+                android:layout_margin="10dp"/>
+
+        </GridLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_choose_gallery_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ou choisir depuis la galerie"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/colorSecondary"/>
+
+</LinearLayout>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "317187285938",
+    "project_id": "monchatapp-da157",
+    "storage_bucket": "monchatapp-da157.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317187285938:android:c7c535592ac2e6c8337aab",
+        "android_client_info": {
+          "package_name": "com.example.chat_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXDOC-tX1hdnINhkViXRMovRqldn5JyfI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

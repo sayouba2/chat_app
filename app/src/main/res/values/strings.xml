@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">chat_app</string>
+    <string name="app_name">Ping Me</string>
     <string name="login_title">Bienvenue !</string>
 
     <string name="hint_email">Adresse E-mail</string>
@@ -11,4 +11,5 @@
     <string name="button_create_account">Creer mon compte</string>
     <string name="hint_nometprenom">Nom et Prenom</string>
     <string name="hint_pseudo">Pseudo</string>
+    <string name="modifier_l_image">Modifier l\'image</string>
 </resources>
