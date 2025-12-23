@@ -18,9 +18,23 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class LoginActivity extends AppCompatActivity {
+    private void saveFcmToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) return;
 
+                    String token = task.getResult();
+                    String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                    // On met à jour le token dans Firestore
+                    FirebaseFirestore.getInstance().collection("users").document(currentUid)
+                            .update("fcmToken", token);
+                });
+    }
     private TextInputLayout emailLayout, passwordLayout;
     private TextInputEditText emailEditText, passwordEditText;
     private Button loginButton;
@@ -123,6 +137,7 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Succès
                             Toast.makeText(LoginActivity.this, "Connexion réussie !", Toast.LENGTH_SHORT).show();
+                            saveFcmToken();
                             goToChatActivity();
                         } else {
                             // Échec

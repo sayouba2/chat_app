@@ -49,7 +49,10 @@ dependencies {
     // FIREBASE
     // 1. La plateforme (OBLIGATOIRE)
     implementation(platform(libs.firebase.bom))
-
+    implementation("com.google.firebase:firebase-database:20.3.0")
+// Pour le statut En ligne
+    implementation("com.google.firebase:firebase-messaging:23.4.0")
+// Pour les notifications
     // 2. Les librairies (Sans version, car le BOM gère ça)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)

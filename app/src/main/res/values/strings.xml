@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">chat_app</string>
+    <string name="app_name">Ping Me</string>
     <string name="login_title">Bienvenue !</string>
 
     <string name="hint_email">Adresse E-mail</string>

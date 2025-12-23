@@ -6,6 +6,7 @@
     android:background="@color/colorBackground"
     android:padding="20dp">
 
+    <!-- Barre de recherche (Fixe en haut) -->
     <EditText
         android:id="@+id/etSearch"
         android:layout_width="0dp"
@@ -14,7 +15,7 @@
         android:background="@drawable/bg_search_rounded"
         android:drawableStart="@android:drawable/ic_menu_search"
         android:drawablePadding="10dp"
-        android:hint="Rechercher Un Pseudo"
+        android:hint="Rechercher..."
         android:paddingStart="15dp"
         android:textColor="@color/colorPrimary"
         android:textColorHint="@color/text_hint"
@@ -22,37 +23,98 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/titrePage"
-        android:layout_width="wrap_content"
+    <!-- Zone des boutons d'action -->
+    <LinearLayout
+        android:id="@+id/actionLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="Boîte de réception"
-        android:textColor="@color/colorPrimary"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etSearch" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnCompose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/colorSecondary"
-        android:text="Écrire"
-        android:textAllCaps="false"
-        app:cornerRadius="20dp"
-        app:layout_constraintBottom_toBottomOf="@id/titrePage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/titrePage" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewDiscussions"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
         android:layout_marginTop="15dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/etSearch">
+
+        <TextView
+            android:id="@+id/titrePage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Discussions"
+            android:textColor="@color/colorPrimary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCompose"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:text="Ecrire"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            app:backgroundTint="@color/colorSecondary"
+            app:cornerRadius="20dp"
+            android:layout_marginEnd="10dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"/>
+
+        <!-- MODIFIÉ : Bouton Ajouter Ami (Cercle avec +) -->
+        <ImageButton
+            android:id="@+id/btnAddFriend"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/circle_shape"
+            android:backgroundTint="@color/colorPrimary"
+            android:src="@drawable/ic_plus_24"
+            app:tint="@color/white"
+            android:tooltipText="Ajouter Ami"/>
+    </LinearLayout>
+
+    <!-- Zone scrollable pour les deux listes -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/titrePage" />
+        app:layout_constraintTop_toBottomOf="@id/actionLayout">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Section Privée -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Messages Privés"
+                android:textColor="#888888"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="5dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerPrivate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+            <!-- Section Groupes -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Groupes"
+                android:textColor="#888888"
+                android:textStyle="bold"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="5dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerGroups"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
