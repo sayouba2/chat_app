@@ -11,7 +11,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FindFriendsActivity extends AppCompatActivity {
+public class FindFriendsActivity extends navbarActivity {
 
     private RecyclerView recyclerView;
     private FindFriendsAdapter adapter;
