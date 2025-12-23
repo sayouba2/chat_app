@@ -129,11 +129,9 @@ public class navbarActivity extends AppCompatActivity {
                     }
 
                 } else if (id == R.id.profil_view) {
-                    // --- MES INFOS ---
-                    // Créez une ProfileActivity si vous en avez une, sinon Toast pour l'instant
-                    Toast.makeText(navbarActivity.this, "Page Profil bientôt disponible", Toast.LENGTH_SHORT).show();
-                    // Intent intent = new Intent(navbarActivity.this, ProfileActivity.class);
-                    // startActivity(intent);
+                    Toast.makeText(navbarActivity.this, "Mes informations", Toast.LENGTH_SHORT).show();
+                     Intent intent = new Intent(navbarActivity.this, UserInformations.class);
+                     startActivity(intent);
 
                 } else if (id == R.id.logout) {
                     // --- DÉCONNEXION ---

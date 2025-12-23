@@ -36,7 +36,7 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class CreateGroupActivity extends AppCompatActivity {
+public class CreateGroupActivity extends navbarActivity {
 
     private ImageButton btnBack;
     private CircleImageView imgGroup;
