@@ -1,72 +1,105 @@
-<?xml version="1.0" encoding="utf-8"?><androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F6FA"
+    android:background="@color/colorBackground"
     tools:context=".DiscussionActivity">
 
-    <!-- 1. HEADER MODERNE (Fond coloré en haut) -->
+    <!-- Header avec coins arrondis en bas -->
     <View
         android:id="@+id/headerBackground"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:background="@drawable/bg_header_gradient"
-        android:backgroundTint="@color/colorPrimary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="180dp"
+        android:background="@drawable/bg_header_bottom_round"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
-    <!-- Titre et Boutons d'action -->
+    <!-- Titre Discussions -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="28dp"
         android:text="Discussions"
-        android:textColor="@android:color/white"
-        android:textSize="28sp"
+        android:textColor="@color/white"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="Vos conversations"
+        android:textColor="#A8C9EC"
+        android:textSize="13sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"/>
+
+    <!-- Bouton déconnexion -->
     <ImageButton
         android:id="@+id/btnMenu"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Déconnexion"
         android:src="@android:drawable/ic_lock_power_off"
-        app:tint="@android:color/white"
+        app:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
+    <!-- Bouton ajouter ami -->
     <ImageButton
         android:id="@+id/btnAddFriend"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:layout_marginEnd="8dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Ajouter Ami"
+        android:contentDescription="Ajouter un ami"
         android:src="@android:drawable/ic_menu_add"
-        app:tint="@android:color/white"
+        app:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="@id/btnMenu"
         app:layout_constraintEnd_toStartOf="@id/btnMenu"
-        app:layout_constraintTop_toTopOf="@id/btnMenu" />
+        app:layout_constraintTop_toTopOf="@id/btnMenu"/>
 
-    <!-- 2. BARRE DE RECHERCHE FLOTTANTE (CardView) -->
+    <!-- Badge demandes d'amis en attente -->
+    <TextView
+        android:id="@+id/badge_friend_requests"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:background="@drawable/circle_shape"
+        android:backgroundTint="#FF3B30"
+        android:gravity="center"
+        android:text="!"
+        android:textColor="@color/white"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:layout_marginEnd="-2dp"
+        android:layout_marginTop="-2dp"
+        app:layout_constraintEnd_toEndOf="@id/btnAddFriend"
+        app:layout_constraintTop_toTopOf="@id/btnAddFriend"/>
+
+    <!-- Barre de recherche flottante -->
     <androidx.cardview.widget.CardView
         android:id="@+id/searchCard"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="20dp"
-        app:cardCornerRadius="15dp"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:cardBackgroundColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
         <EditText
@@ -75,60 +108,67 @@
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:drawableStart="@android:drawable/ic_menu_search"
-            android:drawablePadding="12dp"
-            android:hint="Rechercher une discussion..."
+            android:drawablePadding="10dp"
+            android:hint="Rechercher..."
             android:paddingStart="16dp"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="14sp" />
+            android:paddingEnd="16dp"
+            android:textColor="@color/colorTextPrimary"
+            android:textColorHint="@color/text_hint"
+            android:textSize="14sp"
+            android:inputType="text"
+            android:imeOptions="actionSearch"
+            android:singleLine="true"/>
     </androidx.cardview.widget.CardView>
 
-    <!-- 3. LISTE DES DISCUSSIONS -->
+    <!-- Liste des discussions -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerDiscussions"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="16dp"
         android:clipToPadding="false"
-        android:paddingBottom="80dp"
+        android:paddingBottom="88dp"
+        app:layout_constraintTop_toBottomOf="@id/headerBackground"
         app:layout_constraintBottom_toTopOf="@id/bottomProfileCard"
-        app:layout_constraintTop_toBottomOf="@id/searchCard"
-        tools:listitem="@layout/item_discussion" />
+        tools:listitem="@layout/item_discussion"/>
 
-    <!-- 4. BARRE PROFIL EN BAS (Demandé) -->
+    <!-- Barre profil en bas -->
     <androidx.cardview.widget.CardView
         android:id="@+id/bottomProfileCard"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardBackgroundColor="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="20dp"
         app:cardElevation="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="12dp">
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
-            <!-- Photo de profil -->
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/bottomProfileImage"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/img"
                 app:civ_border_color="@color/colorSecondary"
-                app:civ_border_width="2dp" />
+                app:civ_border_width="2dp"/>
 
-            <!-- Infos (Pseudo + Amis) -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="14dp"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
@@ -138,8 +178,8 @@
                     android:layout_height="wrap_content"
                     android:text="Chargement..."
                     android:textColor="@color/colorPrimaryDark"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:textSize="15sp"
+                    android:textStyle="bold"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -152,35 +192,42 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textColor="@color/colorSecondary"
-                        android:textStyle="bold" />
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold"
+                        android:textSize="13sp"/>
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
                         android:text="amis"
-                        android:textColor="#888888"
-                        android:textSize="12sp" />
+                        android:textColor="@color/colorTextSecondary"
+                        android:textSize="12sp"/>
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- Point vert = en ligne -->
+            <View
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/shape_status_online"
+                android:layout_marginEnd="4dp"/>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- 5. BOUTON FLOTTANT (FAB) pour Écrire -->
-    <!-- Remplace l'ancien bouton "Ecrire" -->
+    <!-- FAB composer un message -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnCompose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="16dp"
         android:contentDescription="Nouvelle discussion"
         android:src="@drawable/ic_plus_24"
-        app:backgroundTint="@color/colorSecondary"
+        app:backgroundTint="@color/colorPrimary"
+        app:tint="@color/white"
         app:layout_constraintBottom_toTopOf="@id/bottomProfileCard"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@android:color/white" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -177,15 +178,27 @@ public class RegisterActivity extends AppCompatActivity {
             isValid = false;
         } else { pseudoLayout.setError(null); }
 
-        if (TextUtils.isEmpty(emailEditText.getText())) {
+        String email = emailEditText.getText().toString().trim();
+        if (TextUtils.isEmpty(email)) {
             emailLayout.setError("L'email est requis");
             isValid = false;
-        } else { emailLayout.setError(null); }
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailLayout.setError("Format d'email invalide");
+            isValid = false;
+        } else {
+            emailLayout.setError(null);
+        }
 
-        if (TextUtils.isEmpty(passwordEditText.getText())) {
+        String password = passwordEditText.getText().toString().trim();
+        if (TextUtils.isEmpty(password)) {
             passwordLayout.setError("Le mot de passe est requis");
             isValid = false;
-        } else { passwordLayout.setError(null); }
+        } else if (password.length() < 6) {
+            passwordLayout.setError("Le mot de passe doit contenir au moins 6 caractères");
+            isValid = false;
+        } else {
+            passwordLayout.setError(null);
+        }
 
         return isValid;
     }

@@ -42,9 +42,6 @@
             android:exported="false"
             android:parentActivityName=".DiscussionActivity" />
         <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-        <activity
             android:name=".UserInformations"
             android:exported="false" />
 

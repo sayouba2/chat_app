@@ -1,54 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:background="@drawable/white_background_rounded"
-    android:layout_marginBottom="5dp">
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@color/white">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/img_user_avatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/profile"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <TextView
-        android:id="@+id/tv_user_name"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:text="Nom Utilisateur"
-        android:textStyle="bold"
-        android:textColor="#000"
-        app:layout_constraintStart_toEndOf="@id/img_user_avatar"
-        app:layout_constraintTop_toTopOf="@id/img_user_avatar"
-        app:layout_constraintEnd_toStartOf="@id/btn_action_user"/>
+        android:padding="12dp">
 
-    <TextView
-        android:id="@+id/tv_user_status"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:text="En ligne"
-        android:textSize="12sp"
-        app:layout_constraintStart_toEndOf="@id/img_user_avatar"
-        app:layout_constraintTop_toBottomOf="@id/tv_user_name"
-        app:layout_constraintEnd_toStartOf="@id/btn_action_user"/>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/img_user_avatar"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:src="@drawable/profile"
+            app:civ_border_color="@color/colorSecondary"
+            app:civ_border_width="1.5dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <!-- Ce bouton changera de texte et de couleur selon l'état -->
-    <Button
-        android:id="@+id/btn_action_user"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp"
-        android:text="Ajouter"
-        android:textSize="12sp"
-        android:backgroundTint="@color/colorPrimary"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        <TextView
+            android:id="@+id/tv_user_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:text="Nom Utilisateur"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:textColor="@color/colorPrimaryDark"
+            app:layout_constraintStart_toEndOf="@id/img_user_avatar"
+            app:layout_constraintTop_toTopOf="@id/img_user_avatar"
+            app:layout_constraintEnd_toStartOf="@id/btn_action_user"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_user_status"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="3dp"
+            android:text="@pseudo"
+            android:textSize="12sp"
+            android:textColor="@color/colorTextSecondary"
+            app:layout_constraintStart_toEndOf="@id/img_user_avatar"
+            app:layout_constraintTop_toBottomOf="@id/tv_user_name"
+            app:layout_constraintEnd_toStartOf="@id/btn_action_user"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_action_user"
+            android:layout_width="wrap_content"
+            android:layout_height="38dp"
+            android:text="Ajouter"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/colorPrimary"
+            app:cornerRadius="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

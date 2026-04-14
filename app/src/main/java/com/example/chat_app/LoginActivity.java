@@ -104,6 +104,9 @@ public class LoginActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(email)) {
             emailLayout.setError("L'e-mail est requis");
             isValid = false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailLayout.setError("Format d'e-mail invalide");
+            isValid = false;
         } else {
             emailLayout.setError(null);
         }

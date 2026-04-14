@@ -1,51 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/chat_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#E8EDF5">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="55dp"
-        android:background="@color/colorSecondary"
-        android:elevation="4dp"
+        android:layout_height="68dp"
+        android:background="@drawable/bg_header_gradient"
+        android:elevation="6dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="8dp"
+        android:paddingStart="6dp"
+        android:paddingEnd="8dp"
         tools:ignore="RtlSymmetry">
 
+        <!-- Bouton retour -->
         <ImageButton
             android:id="@+id/btn_back"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Retour"
+            android:padding="8dp"
             android:scaleType="centerInside"
-            android:src="@drawable/back"
-            android:padding="10dp" />
+            android:src="@drawable/back"/>
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            app:cardBackgroundColor="@android:color/transparent"
-            app:cardCornerRadius="25dp"
-            android:layout_marginStart="5dp"
-            app:cardElevation="0dp">
+        <!-- Photo de profil -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/image_profile"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="4dp"
+            android:src="@drawable/profile"
+            app:civ_border_color="#80FFFFFF"
+            app:civ_border_width="2dp"/>
 
-            <ImageView
-                android:id="@+id/image_profile"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/profile" />
-        </androidx.cardview.widget.CardView>
-
+        <!-- Nom du destinataire -->
         <TextView
             android:id="@+id/pseudo"
             android:layout_width="0dp"
@@ -55,40 +52,47 @@
             android:maxLines="1"
             android:paddingStart="12dp"
             android:text="UserName"
-            android:textColor="@color/colorTextOnPrimary"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
 
+        <!-- Menu -->
         <ImageButton
             android:id="@+id/chat_menu"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Menu"
+            android:padding="8dp"
             android:scaleType="centerInside"
             android:src="@drawable/pvertic"
-            app:tint="@color/colorTextOnPrimary" />
+            app:tint="@color/white"/>
     </LinearLayout>
 
+    <!-- Zone messages -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@color/colorBackground"
-        android:paddingBottom="10dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:clipToPadding="false"/>
 
+    <!-- Barre de saisie -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="8dp"
         android:gravity="bottom"
         android:orientation="horizontal"
-        android:paddingStart="8dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
         android:paddingTop="8dp"
-        android:paddingEnd="8dp"
         android:paddingBottom="8dp">
 
+        <!-- Champ de saisie -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -101,14 +105,13 @@
 
             <ImageButton
                 android:id="@+id/stick"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginBottom="2dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Stickers"
-                android:paddingLeft="10dp"
+                android:paddingStart="10dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/stick" />
+                android:src="@drawable/stick"/>
 
             <EditText
                 android:id="@+id/message_input"
@@ -116,33 +119,34 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:hint="Message"
+                android:hint="Message..."
                 android:inputType="textMultiLine|textCapSentences"
                 android:maxLines="5"
-                android:minHeight="48dp"
-                android:paddingStart="5dp"
+                android:minHeight="44dp"
+                android:paddingStart="4dp"
                 android:paddingTop="10dp"
-                android:paddingEnd="5dp"
+                android:paddingEnd="4dp"
                 android:paddingBottom="10dp"
-                android:textColor="@color/colorTextOnPrimary"
-                android:textColorHint="#B3FFFFFF" />
+                android:textColor="@color/colorTextPrimary"
+                android:textColorHint="@color/text_hint"
+                android:textSize="15sp"/>
 
             <ImageButton
                 android:id="@+id/file"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginBottom="2dp"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Fichier"
-                android:paddingRight="10dp"
+                android:contentDescription="Envoyer une photo"
+                android:paddingEnd="10dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/photo" />
+                android:src="@drawable/photo"/>
         </LinearLayout>
 
+        <!-- Bouton envoyer -->
         <LinearLayout
             android:layout_width="50dp"
-            android:layout_height="52dp"
-            android:layout_marginStart="6dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
             android:background="@drawable/bg_circle_sendchat"
             android:gravity="center">
 
@@ -154,7 +158,7 @@
                 android:contentDescription="Envoyer"
                 android:padding="10dp"
                 android:scaleType="centerInside"
-                android:src="@drawable/send" />
+                android:src="@drawable/send"/>
         </LinearLayout>
 
     </LinearLayout>

@@ -25,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.text.SimpleDateFormat;
@@ -44,8 +45,9 @@ public class DiscussionActivity extends AppCompatActivity {
 
     // Nouveaux composants UI
     private ImageButton btnMenu, btnAddFriend;
-    private FloatingActionButton btnCompose; // Changé en FAB
+    private FloatingActionButton btnCompose;
     private EditText etSearch;
+    private TextView badgeFriendRequests;
 
     // Composants de la barre du bas
     private CircleImageView bottomProfileImage;
@@ -55,6 +57,8 @@ public class DiscussionActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private String myUid;
+
+    private ListenerRegistration friendRequestsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +82,9 @@ public class DiscussionActivity extends AppCompatActivity {
 
         // Chargement des données
         chargerDiscussions();
-        loadUserProfileData(); // Charger le profil en bas
+        loadUserProfileData();
         updateUserStatus("online");
+        startFriendRequestsBadge();
     }
 
     private void initViews() {
@@ -88,6 +93,7 @@ public class DiscussionActivity extends AppCompatActivity {
         btnCompose = findViewById(R.id.btnCompose);
         btnAddFriend = findViewById(R.id.btnAddFriend);
         btnMenu = findViewById(R.id.btnMenu);
+        badgeFriendRequests = findViewById(R.id.badge_friend_requests);
 
         // Liaison de la barre du bas
         bottomProfileImage = findViewById(R.id.bottomProfileImage);
@@ -184,11 +190,28 @@ public class DiscussionActivity extends AppCompatActivity {
         }
     }
 
+    // Écoute en temps réel les demandes d'amis reçues et affiche un badge
+    private void startFriendRequestsBadge() {
+        if (myUid == null) return;
+        friendRequestsListener = db.collection("FriendRequests")
+                .whereEqualTo("to", myUid)
+                .addSnapshotListener((snapshots, error) -> {
+                    if (error != null || snapshots == null || badgeFriendRequests == null) return;
+                    int count = snapshots.size();
+                    if (count > 0) {
+                        badgeFriendRequests.setVisibility(android.view.View.VISIBLE);
+                        badgeFriendRequests.setText(count > 9 ? "9+" : String.valueOf(count));
+                    } else {
+                        badgeFriendRequests.setVisibility(android.view.View.GONE);
+                    }
+                });
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
         updateUserStatus("online");
-        loadUserProfileData(); // Recharger les infos (ex: si nbr amis change)
+        loadUserProfileData();
     }
 
     @Override
@@ -196,6 +219,14 @@ public class DiscussionActivity extends AppCompatActivity {
         super.onPause();
         if (isFinishing()) {
             updateUserStatus("offline");
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (friendRequestsListener != null) {
+            friendRequestsListener.remove();
         }
     }
 

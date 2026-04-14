@@ -1,40 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp">
+    android:orientation="vertical"
+    android:gravity="end"
+    android:paddingStart="64dp"
+    android:paddingEnd="14dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp">
 
+    <!-- Bulle texte (droite) -->
     <TextView
         android:id="@+id/show_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:background="@drawable/bg_bubble_right"
-        android:paddingStart="15dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
         android:paddingTop="10dp"
-        android:paddingEnd="15dp"
         android:paddingBottom="10dp"
-        android:text="Mon message"
         android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:maxWidth="280dp"/>
+        android:textSize="15sp"
+        android:maxWidth="280dp"
+        android:lineSpacingExtra="2dp"
+        android:visibility="visible"/>
+
+    <!-- Bulle image (droite) -->
+    <ImageView
+        android:id="@+id/img_message"
+        android:layout_width="220dp"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:background="@drawable/bg_bubble_right"
+        android:visibility="gone"
+        android:clipToOutline="true"/>
+
+    <!-- Statut Envoyé / Vu -->
     <TextView
         android:id="@+id/txt_seen"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/show_message"
-        android:layout_alignParentEnd="true"
         android:text="Envoyé"
         android:textSize="10sp"
-        android:textColor="#AAAAAA"
-        android:layout_marginTop="2dp"/>
-    <ImageView
-        android:id="@+id/img_message"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:visibility="gone"
-        android:layout_gravity="end"
-        android:layout_marginTop="5dp"/>
+        android:textColor="@color/colorTextSecondary"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"/>
 
-</RelativeLayout>
+</LinearLayout>

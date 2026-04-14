@@ -2,15 +2,17 @@ package com.example.chat_app;
 
 public class Discussion {
     private String nom;
-    private String dernierMessage;private String heure;
+    private String dernierMessage;
+    private String heure;
     private String photoUrl;
     private boolean isNonLu;
     private String uid;
+    private String type;
 
     // Constructeur vide (Requis par Firebase)
     public Discussion() { }
 
-    // --- CONSTRUCTEUR FINAL À 6 PARAMÈTRES ---
+    // Constructeur à 6 paramètres (sans type)
     public Discussion(String nom, String dernierMessage, String heure, String photoUrl, boolean isNonLu, String uid) {
         this.nom = nom;
         this.dernierMessage = dernierMessage;
@@ -18,6 +20,18 @@ public class Discussion {
         this.photoUrl = photoUrl;
         this.isNonLu = isNonLu;
         this.uid = uid;
+        this.type = null;
+    }
+
+    // Constructeur à 7 paramètres (avec type, ex: "group")
+    public Discussion(String nom, String dernierMessage, String heure, String photoUrl, boolean isNonLu, String uid, String type) {
+        this.nom = nom;
+        this.dernierMessage = dernierMessage;
+        this.heure = heure;
+        this.photoUrl = photoUrl;
+        this.isNonLu = isNonLu;
+        this.uid = uid;
+        this.type = type;
     }
 
     // --- Getters ---
@@ -27,4 +41,5 @@ public class Discussion {
     public String getPhotoUrl() { return photoUrl; }
     public boolean isNonLu() { return isNonLu; }
     public String getUid() { return uid; }
+    public String getType() { return type; }
 }

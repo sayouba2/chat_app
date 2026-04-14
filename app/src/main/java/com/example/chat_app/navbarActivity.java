@@ -121,12 +121,9 @@ public class navbarActivity extends AppCompatActivity {
 
                 if (id == R.id.home_view) {
                     // --- HOME : Retour à la liste des discussions ---
-                    if (!(navbarActivity.this instanceof DiscussionActivity)) {
-                        Intent intent = new Intent(navbarActivity.this, DiscussionActivity.class);
-                        // flags pour éviter d'empiler les activités
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
+                    Intent intent = new Intent(navbarActivity.this, DiscussionActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
 
                 } else if (id == R.id.profil_view) {
                     Toast.makeText(navbarActivity.this, "Mes informations", Toast.LENGTH_SHORT).show();
@@ -195,6 +192,8 @@ public class navbarActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        updateUserStatus("offline");
+        // Ne pas mettre offline ici : chaque changement d'écran déclencherait onPause,
+        // ce qui marquerait l'utilisateur offline même en naviguant entre les activités.
+        // Le statut offline est géré uniquement à la déconnexion explicite (logout).
     }
 }

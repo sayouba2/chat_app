@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorBackground">#EEEEEE</color>
-    <color name="colorSecondary">#508C9B</color>
-    <color name="colorPrimary">#134B70</color>
-    <color name="colorPrimaryDark">#201E43</color>
+    <!-- Palette principale -->
+    <color name="colorPrimary">#1565C0</color>
+    <color name="colorPrimaryDark">#003c8f</color>
+    <color name="colorSecondary">#42A5F5</color>
+    <color name="colorBackground">#F0F4F8</color>
+    <color name="colorSurface">#FFFFFF</color>
+
+    <!-- Textes -->
     <color name="colorTextOnPrimary">#FFFFFF</color>
-    <color name="text_hint">#7D8FB3</color>
+    <color name="colorTextPrimary">#1A237E</color>
+    <color name="colorTextSecondary">#607D8B</color>
+    <color name="text_hint">#9CA3AF</color>
 
-    <color name="colorAccent">#FF4081</color>
+    <!-- Accents -->
+    <color name="colorAccent">#FF6B6B</color>
 
+    <!-- Basiques -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 
-    <color name="colorTextPrimary">#000000</color>
-    <color name="colorTextSecondary">#757575</color>
-    <color name="chat_bubble_right">#0084FF</color>
-    <color name="chat_bubble_left">#E4E6EB</color>
+    <!-- Bulles de chat -->
+    <color name="chat_bubble_right">#1565C0</color>
+    <color name="chat_bubble_left">#FFFFFF</color>
+
+    <!-- Statut -->
+    <color name="colorOnline">#4CAF50</color>
+    <color name="colorOffline">#B0BEC5</color>
+
+    <!-- Dividers / Borders -->
+    <color name="colorDivider">#E8ECF4</color>
 </resources>

@@ -60,7 +60,7 @@ public class FindFriendsAdapter extends RecyclerView.Adapter<FindFriendsAdapter.
         String otherUid = user.getUid();
 
         holder.tvName.setText(user.getNom());
-        holder.tvStatus.setText("@" + user.getDernierMessage()); // On utilise ce champ pour le pseudo temporairement
+        holder.tvStatus.setText(user.getDernierMessage());
 
         // Gestion Image
         String photoUrl = user.getPhotoUrl();

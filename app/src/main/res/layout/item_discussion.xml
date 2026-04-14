@@ -1,76 +1,76 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_item_with_border"
-    android:padding="12dp"
-    android:layout_marginHorizontal="5dp"
-    android:layout_marginTop="8dp">
+    android:background="?attr/selectableItemBackground"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardAvatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="0dp"
+    <!-- Avatar -->
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgAvatar"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:src="@drawable/img"
+        app:civ_border_color="@color/colorDivider"
+        app:civ_border_width="1.5dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="ContentDescription"/>
 
-        <ImageView
-            android:id="@+id/imgAvatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img"
-            tools:ignore="ContentDescription" />
-        <View
-            android:id="@+id/img_status_on"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:background="@drawable/shape_status_online"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/imgAvatar"
-            app:layout_constraintEnd_toEndOf="@id/imgAvatar"
-            android:layout_marginBottom="2dp"
-            android:layout_marginEnd="2dp" />
-        <View
-            android:id="@+id/img_status_off"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:background="@drawable/shape_status_offline"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@id/imgAvatar"
-            app:layout_constraintEnd_toEndOf="@id/imgAvatar"
-            android:layout_marginBottom="2dp"
-            android:layout_marginEnd="2dp" />
-    </androidx.cardview.widget.CardView>
+    <!-- Pastille online -->
+    <View
+        android:id="@+id/img_status_on"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:background="@drawable/shape_status_online"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/imgAvatar"
+        app:layout_constraintBottom_toBottomOf="@id/imgAvatar"/>
 
+    <!-- Pastille offline -->
+    <View
+        android:id="@+id/img_status_off"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:background="@drawable/shape_status_offline"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="@id/imgAvatar"
+        app:layout_constraintBottom_toBottomOf="@id/imgAvatar"/>
+
+    <!-- Heure -->
     <TextView
         android:id="@+id/txtHeure"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="09:56"
-        android:textColor="#009688"
+        android:textColor="@color/colorSecondary"
         android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="@id/txtNom"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/txtNom" />
+        app:layout_constraintTop_toTopOf="@id/imgAvatar"/>
 
+    <!-- Nom -->
     <TextView
         android:id="@+id/txtNom"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="14dp"
         android:layout_marginEnd="8dp"
-        android:text="Josiah Zayner"
-        android:textColor="#0D1C3E"
+        android:text="Nom Prénom"
+        android:textColor="@color/colorPrimaryDark"
         android:textSize="16sp"
         android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/imgAvatar"
         app:layout_constraintEnd_toStartOf="@id/txtHeure"
-        app:layout_constraintStart_toEndOf="@id/cardAvatar"
-        app:layout_constraintTop_toTopOf="@id/cardAvatar" />
+        app:layout_constraintTop_toTopOf="@id/imgAvatar"/>
 
+    <!-- Dernier message -->
     <TextView
         android:id="@+id/txtMessage"
         android:layout_width="0dp"
@@ -78,11 +78,12 @@
         android:layout_marginTop="4dp"
         android:layout_marginEnd="16dp"
         android:ellipsize="end"
-        android:maxLines="2"
-        android:text="Salut ! Comment vas-tu aujourd'hui ? Je voulais faire un point..."
-        android:textColor="#68768A"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:maxLines="1"
+        android:text="Dernier message..."
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="13sp"
         app:layout_constraintStart_toStartOf="@id/txtNom"
-        app:layout_constraintTop_toBottomOf="@id/txtNom" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtNom"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

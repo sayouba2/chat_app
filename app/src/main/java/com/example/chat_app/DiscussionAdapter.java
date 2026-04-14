@@ -15,10 +15,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.List;
 
@@ -82,15 +80,20 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
         }
 
         // --- GESTION STATUT EN LIGNE ---
+        // Annuler l'ancien listener avant d'en attacher un nouveau (évite les fuites mémoire)
+        if (holder.statusListener != null) {
+            holder.statusListener.remove();
+            holder.statusListener = null;
+        }
         if (discussion.getUid() != null) {
-            FirebaseFirestore.getInstance().collection("users").document(discussion.getUid())
+            holder.statusListener = FirebaseFirestore.getInstance()
+                    .collection("users").document(discussion.getUid())
                     .addSnapshotListener((snapshot, error) -> {
                         if (error != null || snapshot == null || !snapshot.exists()) {
                             holder.imgStatusOn.setVisibility(View.GONE);
                             holder.imgStatusOff.setVisibility(View.VISIBLE);
                             return;
                         }
-
                         String status = snapshot.getString("status");
                         if ("online".equals(status)) {
                             holder.imgStatusOn.setVisibility(View.VISIBLE);
@@ -120,10 +123,20 @@ public class DiscussionAdapter extends RecyclerView.Adapter<DiscussionAdapter.Vi
         return discussionList.size();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        super.onViewRecycled(holder);
+        if (holder.statusListener != null) {
+            holder.statusListener.remove();
+            holder.statusListener = null;
+        }
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView txtNom, txtMessage, txtHeure;
         public ImageView imgAvatar;
         public View imgStatusOn, imgStatusOff;
+        public ListenerRegistration statusListener;
 
         public ViewHolder(View itemView) {
             super(itemView);

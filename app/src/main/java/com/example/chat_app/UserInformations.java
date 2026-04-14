@@ -1,19 +1,20 @@
 package com.example.chat_app;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +22,8 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class UserInformations extends navbarActivity {
+
+    private static final int PICK_IMAGE_REQUEST = 1;
 
     private CircleImageView profileImg;
     private TextInputEditText editName, editPseudo;
@@ -46,9 +49,24 @@ public class UserInformations extends navbarActivity {
 
         btnSave.setOnClickListener(v -> updateProfile());
 
-        findViewById(R.id.btn_change_photo).setOnClickListener(v -> {
-            // Appelle ta fonction openFileChooser() ici
-        });
+        findViewById(R.id.btn_change_photo).setOnClickListener(v -> openFileChooser());
+    }
+
+    private void openFileChooser() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
+                && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            profileImg.setImageURI(imageUri);
+        }
     }
 
     private void loadUserData() {
@@ -57,24 +75,65 @@ public class UserInformations extends navbarActivity {
                     if (doc.exists()) {
                         editName.setText(doc.getString("name"));
                         editPseudo.setText(doc.getString("pseudo"));
-                        // Utilise Glide pour charger l'image doc.getString("image")
+
+                        String image = doc.getString("image");
+                        if (image != null && !image.isEmpty()) {
+                            if (image.startsWith("http")) {
+                                Glide.with(this).load(image).placeholder(R.drawable.img).into(profileImg);
+                            } else {
+                                int resId = getResources().getIdentifier(image, "drawable", getPackageName());
+                                profileImg.setImageResource(resId != 0 ? resId : R.drawable.img);
+                            }
+                        }
                     }
                 });
     }
 
     private void updateProfile() {
-        String newName = editName.getText().toString();
-        String newPseudo = editPseudo.getText().toString();
+        String newName = editName.getText().toString().trim();
+        String newPseudo = editPseudo.getText().toString().trim();
 
+        if (newName.isEmpty() || newPseudo.isEmpty()) {
+            Toast.makeText(this, "Le nom et le pseudo sont requis", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        btnSave.setEnabled(false);
+
+        if (imageUri != null) {
+            // Upload de la nouvelle photo, puis mise à jour du profil
+            StorageReference fileRef = FirebaseStorage.getInstance().getReference()
+                    .child("profile_images/" + currentUid + ".jpg");
+            fileRef.putFile(imageUri)
+                    .addOnSuccessListener(snap -> fileRef.getDownloadUrl()
+                            .addOnSuccessListener(uri -> saveProfileData(newName, newPseudo, uri.toString())))
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Erreur upload photo : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        btnSave.setEnabled(true);
+                    });
+        } else {
+            saveProfileData(newName, newPseudo, null);
+        }
+    }
+
+    private void saveProfileData(String name, String pseudo, String newImageUrl) {
         Map<String, Object> updates = new HashMap<>();
-        updates.put("name", newName);
-        updates.put("pseudo", newPseudo);
+        updates.put("name", name);
+        updates.put("pseudo", pseudo);
+        if (newImageUrl != null) {
+            updates.put("image", newImageUrl);
+        }
 
         db.collection("users").document(currentUid).update(updates)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Profil mis à jour !", Toast.LENGTH_SHORT).show();
-                    finish(); // Retourne à l'écran précédent
+                    imageUri = null;
+                    btnSave.setEnabled(true);
+                    finish();
                 })
-                .addOnFailureListener(e -> Toast.makeText(this, "Erreur", Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Erreur : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    btnSave.setEnabled(true);
+                });
     }
 }

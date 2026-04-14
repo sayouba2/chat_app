@@ -24,8 +24,6 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -40,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ChatActivity extends navbarActivity {
-    private ValueEventListener seenListener;
-    private DatabaseReference userRefForSeen;
     // Vues (maintenant déclarées au niveau de la classe)
     private ImageButton btnBack, btnSend;
     private EditText msgInput;
@@ -101,26 +97,24 @@ public class ChatActivity extends navbarActivity {
 
         // Récup des infos (envoyées par DiscussionActivity)
         otherUid = getIntent().getStringExtra("uid_destinataire");
-        receiverName = getIntent().getStringExtra("nom_destinataire"); // Attribution à la variable globale
-        receiverImage = getIntent().getStringExtra("image_destinataire"); // Attribution à la variable globale
-        if (receiverImage != null && !receiverImage.equals("default")) {
-            if (receiverImage.startsWith("http")) {
-                Glide.with(this).load(receiverImage).into(profileIv);
-            } else {
-                int resId = getResources().getIdentifier(receiverImage, "drawable", getPackageName());
-                if(resId != 0) profileIv.setImageResource(resId);
-            }
-        }
+        receiverName = getIntent().getStringExtra("nom_destinataire");
+        receiverImage = getIntent().getStringExtra("image_destinataire");
+
         // Générer ID conversation unique (A_B ou B_A)
         if (myUid.compareTo(otherUid) < 0) chatRoomId = myUid + "_" + otherUid;
         else chatRoomId = otherUid + "_" + myUid;
 
         initViews();
 
-        // Remplir header immédiatement
+        // Remplir header
         pseudoTv.setText(receiverName);
-        if (receiverImage != null && !receiverImage.equals("default")) {
-            Glide.with(this).load(receiverImage).into(profileIv);
+        if (receiverImage != null && !receiverImage.isEmpty()) {
+            if (receiverImage.startsWith("http")) {
+                Glide.with(this).load(receiverImage).into(profileIv);
+            } else {
+                int resId = getResources().getIdentifier(receiverImage, "drawable", getPackageName());
+                if (resId != 0) profileIv.setImageResource(resId);
+            }
         }
 
         // Charger les données MOI en arrière-plan (myName, myImage)
@@ -231,7 +225,10 @@ public class ChatActivity extends navbarActivity {
         ChatMessage chatMessage = new ChatMessage(sender, receiver, message, new Timestamp(new Date()), type, false);
 
         db.collection("chats").document(chatRoomId).collection("messages")
-                .add(chatMessage);
+                .add(chatMessage)
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Erreur d'envoi : " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
 
         // Pour la liste des conversations, on affiche "Photo" si c'est une image
         String lastMsgPreview = type.equals("image") ? "📷 Photo" : message;

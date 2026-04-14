@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -80,10 +81,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
 
                 if (chat.isSeen()) {
                     holder.txt_seen.setText("Vu");
-                    holder.txt_seen.setTextColor(context.getResources().getColor(android.R.color.holo_blue_light)); // Bleu
+                    holder.txt_seen.setTextColor(ContextCompat.getColor(context, android.R.color.holo_blue_light));
                 } else {
                     holder.txt_seen.setText("Envoyé");
-                    holder.txt_seen.setTextColor(context.getResources().getColor(android.R.color.darker_gray)); // Gris
+                    holder.txt_seen.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray));
                 }
             }
         } else {
